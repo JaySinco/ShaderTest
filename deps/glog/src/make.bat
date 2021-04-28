@@ -5,7 +5,7 @@ CALL VC\Auxiliary\Build\vcvars64.bat
 POPD
 
 SET OUTDIR=out
-IF NOT EXIST %OUTDIR% MKDIR %OUTDIR%
+IF NOT EXIST %OUTDIR% (MKDIR %OUTDIR%)
 PUSHD %OUTDIR%
 cmake -G Ninja ^
     -DWITH_GFLAGS=on ^

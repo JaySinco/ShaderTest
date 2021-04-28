@@ -4,9 +4,9 @@ SET OUTDIR=out
 SET BINDIR=bin
 SET TOOLDIR=%~dp0deps\.tools\bin
 
-if "%1" == "clean" (
-    IF EXIST %OUTDIR% RMDIR /S/Q %OUTDIR%
-    IF EXIST %BINDIR% RMDIR /S/Q %BINDIR%
+IF "%1" == "clean" (
+    IF EXIST %OUTDIR% (RMDIR /S/Q %OUTDIR%)
+    IF EXIST %BINDIR% (RMDIR /S/Q %BINDIR%)
     GOTO end
 )
 
@@ -17,7 +17,7 @@ PUSHD C:\Program Files (x86)\Microsoft Visual Studio\2019\Community
 CALL VC\Auxiliary\Build\vcvars64.bat
 POPD
 
-IF NOT EXIST %OUTDIR% MKDIR %OUTDIR%
+IF NOT EXIST %OUTDIR% (MKDIR %OUTDIR%)
 PUSHD %OUTDIR%
 cmake -G Ninja ^
     -DCMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE=%~dp0%BINDIR%\ ^
