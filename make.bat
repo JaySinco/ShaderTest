@@ -11,7 +11,7 @@ IF "%1" == "clean" (
 )
 
 %TOOLDIR%\cloc.exe --quiet src shaders
-FOR /R %~dp0src %%f IN (*.cpp) DO (%TOOLDIR%\clang-format.exe -i %%f)
+FOR /R %~dp0src %%f IN (*) DO (%TOOLDIR%\clang-format.exe -i %%f)
 
 PUSHD C:\Program Files (x86)\Microsoft Visual Studio\2019\Community
 CALL VC\Auxiliary\Build\vcvars64.bat
