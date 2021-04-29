@@ -1,8 +1,7 @@
-#define UNICODE
-#define GOOGLE_GLOG_DLL_DECL
-#define GLOG_NO_ABBREVIATED_SEVERITIES
-#include <glog/logging.h>
-#include "prec.h"
+/*
+  (C) 2019 David Lettier
+  lettier.com
+*/
 
 #include <thread>
 #include <random>
@@ -10,6 +9,41 @@
 #include <chrono>
 #include <thread>
 #include <algorithm>
+
+#include "pandaFramework.h"  // Panda3D 1.10.1-1
+#include "renderBuffer.h"
+#include "load_prc_file.h"
+#include "pStatClient.h"
+#include "pandaSystem.h"
+#include "mouseButton.h"
+#include "mouseWatcher.h"
+#include "buttonRegistry.h"
+#include "orthographicLens.h"
+#include "ambientLight.h"
+#include "directionalLight.h"
+#include "pointLight.h"
+#include "spotlight.h"
+#include "shader.h"
+#include "nodePathCollection.h"
+#include "auto_bind.h"
+#include "animControlCollection.h"
+#include "cardMaker.h"
+#include "fontPool.h"
+#include "texturePool.h"
+#include "particleSystemManager.h"
+#include "physicsManager.h"
+#include "spriteParticleRenderer.h"
+#include "pointParticleFactory.h"
+#include "pointEmitter.h"
+#include "physicalNode.h"
+#include "forceNode.h"
+#include "linearNoiseForce.h"
+#include "linearVectorForce.h"
+#include "linearJitterForce.h"
+#include "linearCylinderVortexForce.h"
+#include "linearEulerIntegrator.h"
+#include "audioManager.h"
+#include "audioSound.h"
 
 // STRUCTURES
 
@@ -137,11 +171,6 @@ PhysicsManager physicsManager = PhysicsManager();
 
 int main(int argc, char *argv[])
 {
-    FLAGS_logtostderr = 1;
-    FLAGS_minloglevel = 0;
-    gflags::ParseCommandLineFlags(&argc, &argv, true);
-    google::InitGoogleLogging(argv[0]);
-
     LColor backgroundColor[] = {LColor(0.392, 0.537, 0.561, 1), LColor(0.953, 0.733, 0.525, 1)};
 
     double cameraRotatePhiInitial = 67.5095;
@@ -244,7 +273,7 @@ int main(int argc, char *argv[])
 
     PandaFramework framework;
     framework.open_framework(argc, argv);
-    framework.set_window_title("Sample");
+    framework.set_window_title("3D Game Shaders For Beginners By David Lettier");
 
     PT(WindowFramework) window = framework.open_window();
     PT(GraphicsWindow) graphicsWindow = window->get_graphics_window();

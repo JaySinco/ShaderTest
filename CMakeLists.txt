@@ -14,10 +14,7 @@ include_directories(AFTER
     ${CMAKE_SOURCE_DIR}/deps/panda3d/include/
 )
 
-add_executable(sample ${CMAKE_SOURCE_DIR}/src/main.cpp)
-target_precompile_headers(sample PUBLIC ${CMAKE_SOURCE_DIR}/src/prec.h)
-set_target_properties(sample PROPERTIES LINK_FLAGS "/MANIFEST:NO")
-target_link_libraries(sample shlwapi.lib
+set(dep_LIB
     ${CMAKE_SOURCE_DIR}/deps/gflags/lib/gflags_static.lib
     ${CMAKE_SOURCE_DIR}/deps/glog/lib/glog.lib
     ${CMAKE_SOURCE_DIR}/deps/panda3d/lib/libp3framework.lib
@@ -30,3 +27,13 @@ target_link_libraries(sample shlwapi.lib
     ${CMAKE_SOURCE_DIR}/deps/panda3d/lib/libpandafx.lib
     ${CMAKE_SOURCE_DIR}/deps/panda3d/lib/libpandaphysics.lib
 )
+
+add_executable(sample ${CMAKE_SOURCE_DIR}/src/sample.cpp)
+target_precompile_headers(sample PUBLIC ${CMAKE_SOURCE_DIR}/src/prec.h)
+set_target_properties(sample PROPERTIES LINK_FLAGS "/MANIFEST:NO")
+target_link_libraries(sample shlwapi.lib ${dep_LIB})
+
+add_executable(demo ${CMAKE_SOURCE_DIR}/src/demo.cpp)
+target_precompile_headers(demo PUBLIC ${CMAKE_SOURCE_DIR}/src/prec.h)
+set_target_properties(demo PROPERTIES LINK_FLAGS "/MANIFEST:NO")
+target_link_libraries(demo shlwapi.lib ${dep_LIB})
