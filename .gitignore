@@ -6,3 +6,8 @@
 /deps/*/share
 /deps/*/src/*
 !/deps/*/src/make.bat
+
+/eggs
+/fonts
+/images
+/sounds

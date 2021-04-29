@@ -26,4 +26,7 @@ target_link_libraries(sample shlwapi.lib
     ${CMAKE_SOURCE_DIR}/deps/panda3d/lib/libp3dtool.lib
     ${CMAKE_SOURCE_DIR}/deps/panda3d/lib/libp3dtoolconfig.lib
     ${CMAKE_SOURCE_DIR}/deps/panda3d/lib/libp3direct.lib
+    ${CMAKE_SOURCE_DIR}/deps/panda3d/lib/libp3pystub.lib
+    ${CMAKE_SOURCE_DIR}/deps/panda3d/lib/libpandafx.lib
+    ${CMAKE_SOURCE_DIR}/deps/panda3d/lib/libpandaphysics.lib
 )
