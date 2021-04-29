@@ -17,6 +17,8 @@ int main(int argc, char **argv)
     gflags::ParseCommandLineFlags(&argc, &argv, true);
     google::InitGoogleLogging(argv[0]);
 
+    load_prc_file("panda3d-prc-file.prc");
+
     PandaFramework framework;
     framework.open_framework(argc, argv);
     framework.set_window_title("Sample");
