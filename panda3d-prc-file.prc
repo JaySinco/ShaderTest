@@ -3,7 +3,7 @@ load-display               pandagl
 audio-library-name         p3openal_audio
 
 win-origin                 -2 -2
-win-size                   800 600
+win-size                   400 300
 
 fullscreen                 #f
 
