@@ -42,7 +42,7 @@ bool Shader::load(const std::wstring &vertFile, const std::wstring &fragFile)
     return true;
 }
 
-bool Shader::use()
+bool Shader::use() const
 {
     if (!this->loaded) {
         return false;
@@ -77,6 +77,41 @@ std::pair<bool, unsigned> Shader::compile(const std::wstring &file)
         return {false, 0};
     }
     return {true, shader};
+}
+
+std::pair<bool, int> Shader::get_loc(const std::string &name) const
+{
+    if (!this->loaded) {
+        return {false, 0};
+    }
+    int loc = glGetUniformLocation(this->program, name.c_str());
+    if (loc == -1) {
+        LOG(ERROR) << "failed to get uniform location: " << name;
+        return {false, 0};
+    }
+    return {true, loc};
+}
+
+bool Shader::set(const std::string &name, float v0, float v1, float v2) const
+{
+    auto [ok, loc] = this->get_loc(name);
+    if (!ok) {
+        return false;
+    }
+    glUseProgram(this->program);
+    glUniform3f(loc, v0, v1, v2);
+    return true;
+}
+
+bool Shader::set(const std::string &name, float v0, float v1, float v2, float v3) const
+{
+    auto [ok, loc] = this->get_loc(name);
+    if (!ok) {
+        return false;
+    }
+    glUseProgram(this->program);
+    glUniform4f(loc, v0, v1, v2, v3);
+    return true;
 }
 
 }  // namespace gl

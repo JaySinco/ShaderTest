@@ -54,20 +54,17 @@ int main(int argc, char **argv)
 
     gl::Shader basicShader;
     if (!basicShader.load(L"./shaders/vertex/basic.vert", L"./shaders/fragment/basic.frag")) {
-        LOG(ERROR) << "failed to load basic shader";
+        LOG(ERROR) << "failed to load shader: basic";
         return -1;
     }
 
     float vertices[] = {
-        0.5f,  0.5f,  0.0f,  // top right
-        0.5f,  -0.5f, 0.0f,  // bottom right
-        -0.5f, -0.5f, 0.0f,  // bottom left
-        -0.5f, 0.5f,  0.0f   // top left
+        // positions        // colors
+        0.5f,  -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,  // bottom right
+        -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,  // bottom left
+        0.0f,  0.5f,  0.0f, 0.0f, 0.0f, 1.0f   // top
     };
-    unsigned indices[] = {
-        0, 1, 3,  // first Triangle
-        1, 2, 3   // second Triangle
-    };
+    unsigned indices[] = {0, 1, 2};
     gl::Mesh shape;
     shape.load(sizeof(vertices) / sizeof(float), vertices, sizeof(indices) / sizeof(unsigned),
                indices);

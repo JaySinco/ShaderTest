@@ -7,7 +7,7 @@ class Mesh
 public:
     ~Mesh();
     bool load(size_t vtLen, float *vtData, size_t idLen, unsigned *idData);
-    bool draw();
+    bool draw() const;
 
 private:
     unsigned vao, vbo, ebo;

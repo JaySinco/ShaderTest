@@ -21,6 +21,7 @@
         "${workspaceFolder}/deps/glfw/include/",
         "${workspaceFolder}/deps/glad/include/",
         "${workspaceFolder}/deps/fmt/include/",
+        "${workspaceFolder}/deps/glm/include/",
     ],
     "C_Cpp.default.defines": [
         "UNICODE",

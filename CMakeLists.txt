@@ -15,6 +15,7 @@ include_directories(AFTER
     ${CMAKE_SOURCE_DIR}/deps/glfw/include/
     ${CMAKE_SOURCE_DIR}/deps/glad/include/
     ${CMAKE_SOURCE_DIR}/deps/fmt/include/
+    ${CMAKE_SOURCE_DIR}/deps/glm/include/
 )
 
 set(dep_LIB
