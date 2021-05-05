@@ -1,7 +1,6 @@
-#define UNICODE
-#define GOOGLE_GLOG_DLL_DECL
-#define GLOG_NO_ABBREVIATED_SEVERITIES
-#include <glog/logging.h>
+#include "utils.h"
+#include "shader.h"
+#include "mesh.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -53,9 +52,33 @@ int main(int argc, char **argv)
         return -1;
     }
 
+    gl::Shader basicShader;
+    if (!basicShader.load(L"./shaders/vertex/basic.vert", L"./shaders/fragment/basic.frag")) {
+        LOG(ERROR) << "failed to load basic shader";
+        return -1;
+    }
+
+    float vertices[] = {
+        0.5f,  0.5f,  0.0f,  // top right
+        0.5f,  -0.5f, 0.0f,  // bottom right
+        -0.5f, -0.5f, 0.0f,  // bottom left
+        -0.5f, 0.5f,  0.0f   // top left
+    };
+    unsigned indices[] = {
+        0, 1, 3,  // first Triangle
+        1, 2, 3   // second Triangle
+    };
+    gl::Mesh shape;
+    shape.load(sizeof(vertices) / sizeof(float), vertices, sizeof(indices) / sizeof(unsigned),
+               indices);
+
     while (!glfwWindowShouldClose(window)) {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        basicShader.use();
+        shape.draw();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
