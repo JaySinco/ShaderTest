@@ -2,12 +2,25 @@
 #define GOOGLE_GLOG_DLL_DECL
 #define GLOG_NO_ABBREVIATED_SEVERITIES
 #include <glog/logging.h>
-#include "prec.h"
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
-PT(Shader) loadShader(std::string vert, std::string frag)
+void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
-    return Shader::load(Shader::SL_GLSL, "shaders/vertex/" + vert + ".vert",
-                        "shaders/fragment/" + frag + ".frag");
+    if (key == GLFW_KEY_ESCAPE) {
+        switch (action) {
+            case GLFW_PRESS:
+                glfwSetWindowShouldClose(window, true);
+                break;
+            case GLFW_RELEASE:
+                break;
+        }
+    }
+}
+
+void framebuffer_size_callback(GLFWwindow *window, int width, int height)
+{
+    glViewport(0, 0, width, height);
 }
 
 int main(int argc, char **argv)
@@ -17,21 +30,36 @@ int main(int argc, char **argv)
     gflags::ParseCommandLineFlags(&argc, &argv, true);
     google::InitGoogleLogging(argv[0]);
 
-    load_prc_file("panda3d-prc-file.prc");
+    glfwInit();
+    std::shared_ptr<void> glfw_guard(nullptr, [](void *) { glfwTerminate(); });
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    PandaFramework framework;
-    framework.open_framework(argc, argv);
-    framework.set_window_title("Sample");
-    WindowFramework *window = framework.open_window();
-    window->setup_trackball();
+    GLFWwindow *window = glfwCreateWindow(800, 600, "Sample", nullptr, nullptr);
+    if (window == nullptr) {
+        LOG(ERROR) << "failed to create glfw window";
+        return -1;
+    }
+    glfwMakeContextCurrent(window);
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetKeyCallback(window, key_callback);
+    // glfwSetMouseButtonCallback(window, mouse_button_callback);
+    // glfwSetCursorPosCallback(window, cursor_pos_callback);
+    // glfwSetScrollCallback(window, scroll_callback);
 
-    NodePath millScene =
-        window->load_model(framework.get_models(), "eggs/mill-scene/mill-scene.bam");
-    PT(Shader) basicShader = loadShader("basic", "basic");
-    millScene.set_shader(basicShader);
-    millScene.reparent_to(window->get_render());
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+        LOG(ERROR) << "failed to init glad";
+        return -1;
+    }
 
-    framework.main_loop();
-    framework.close_framework();
+    while (!glfwWindowShouldClose(window)) {
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
+
     return 0;
 }

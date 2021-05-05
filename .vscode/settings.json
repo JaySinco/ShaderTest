@@ -15,12 +15,14 @@
         "deps": true,
     },
     "C_Cpp.default.includePath": [
+        "${workspaceFolder}/src/",
         "${workspaceFolder}/deps/gflags/include/",
         "${workspaceFolder}/deps/glog/include/",
-        "${workspaceFolder}/deps/panda3d/include/",
+        "${workspaceFolder}/deps/glfw/include/",
+        "${workspaceFolder}/deps/glad/include/",
     ],
     "C_Cpp.default.defines": [
         "UNICODE",
     ],
-    "C_Cpp.default.cppStandard": "c++14",
+    "C_Cpp.default.cppStandard": "c++17",
 }

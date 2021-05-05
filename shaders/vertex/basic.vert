@@ -1,19 +1,5 @@
-/*
-  (C) 2019 David Lettier
-  lettier.com
-*/
+#version 330 core
 
-#version 150
+layout(location = 0) in vec3 vertPos;
 
-uniform mat4 p3d_ModelViewProjectionMatrix;
-
-in vec2 p3d_MultiTexCoord0;
-in vec4 p3d_Vertex;
-
-out vec2 texCoord;
-
-void main()
-{
-    texCoord = p3d_MultiTexCoord0;
-    gl_Position = p3d_ModelViewProjectionMatrix * p3d_Vertex;
-}
+void main() { gl_Position = vec4(vertPos.xyz, 1.0); }

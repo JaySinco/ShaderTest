@@ -9,31 +9,22 @@ add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
 add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 
 include_directories(AFTER
+    ${CMAKE_SOURCE_DIR}/src/
     ${CMAKE_SOURCE_DIR}/deps/gflags/include/
     ${CMAKE_SOURCE_DIR}/deps/glog/include/
-    ${CMAKE_SOURCE_DIR}/deps/panda3d/include/
+    ${CMAKE_SOURCE_DIR}/deps/glfw/include/
+    ${CMAKE_SOURCE_DIR}/deps/glad/include/
 )
 
 set(dep_LIB
     ${CMAKE_SOURCE_DIR}/deps/gflags/lib/gflags_static.lib
     ${CMAKE_SOURCE_DIR}/deps/glog/lib/glog.lib
-    ${CMAKE_SOURCE_DIR}/deps/panda3d/lib/libp3framework.lib
-    ${CMAKE_SOURCE_DIR}/deps/panda3d/lib/libpanda.lib
-    ${CMAKE_SOURCE_DIR}/deps/panda3d/lib/libpandaexpress.lib
-    ${CMAKE_SOURCE_DIR}/deps/panda3d/lib/libp3dtool.lib
-    ${CMAKE_SOURCE_DIR}/deps/panda3d/lib/libp3dtoolconfig.lib
-    ${CMAKE_SOURCE_DIR}/deps/panda3d/lib/libp3direct.lib
-    ${CMAKE_SOURCE_DIR}/deps/panda3d/lib/libp3pystub.lib
-    ${CMAKE_SOURCE_DIR}/deps/panda3d/lib/libpandafx.lib
-    ${CMAKE_SOURCE_DIR}/deps/panda3d/lib/libpandaphysics.lib
+    ${CMAKE_SOURCE_DIR}/deps/glfw/lib/glfw3.lib
 )
 
-add_executable(sample ${CMAKE_SOURCE_DIR}/src/sample.cpp)
-target_precompile_headers(sample PUBLIC ${CMAKE_SOURCE_DIR}/src/prec.h)
+add_executable(sample
+    ${CMAKE_SOURCE_DIR}/deps/glad/src/glad.c
+    ${CMAKE_SOURCE_DIR}/src/sample.cpp
+)
 set_target_properties(sample PROPERTIES LINK_FLAGS "/MANIFEST:NO")
-target_link_libraries(sample shlwapi.lib ${dep_LIB})
-
-add_executable(demo ${CMAKE_SOURCE_DIR}/src/demo.cpp)
-target_precompile_headers(demo PUBLIC ${CMAKE_SOURCE_DIR}/src/prec.h)
-set_target_properties(demo PROPERTIES LINK_FLAGS "/MANIFEST:NO")
-target_link_libraries(demo shlwapi.lib ${dep_LIB})
+target_link_libraries(sample shlwapi.lib opengl32.lib ${dep_LIB})
