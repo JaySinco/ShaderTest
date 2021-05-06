@@ -22,9 +22,11 @@
         "${workspaceFolder}/deps/glad/include/",
         "${workspaceFolder}/deps/fmt/include/",
         "${workspaceFolder}/deps/glm/include/",
+        "${workspaceFolder}/deps/stb/include/",
     ],
     "C_Cpp.default.defines": [
         "UNICODE",
+        "root_DIR=L\"\"",
     ],
     "C_Cpp.default.cppStandard": "c++17",
 }

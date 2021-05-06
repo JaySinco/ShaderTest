@@ -1,5 +1,4 @@
 #pragma once
-#define UNICODE
 #define BOOST_ALL_NO_LIB
 #define GOOGLE_GLOG_DLL_DECL
 #define GLOG_NO_ABBREVIATED_SEVERITIES

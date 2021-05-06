@@ -16,6 +16,7 @@ include_directories(AFTER
     ${CMAKE_SOURCE_DIR}/deps/glad/include/
     ${CMAKE_SOURCE_DIR}/deps/fmt/include/
     ${CMAKE_SOURCE_DIR}/deps/glm/include/
+    ${CMAKE_SOURCE_DIR}/deps/stb/include/
 )
 
 set(dep_LIB
@@ -30,7 +31,9 @@ add_executable(sample
     ${CMAKE_SOURCE_DIR}/src/utils.cpp
     ${CMAKE_SOURCE_DIR}/src/shader.cpp
     ${CMAKE_SOURCE_DIR}/src/mesh.cpp
+    ${CMAKE_SOURCE_DIR}/src/texture.cpp
     ${CMAKE_SOURCE_DIR}/src/main.cpp
 )
 set_target_properties(sample PROPERTIES LINK_FLAGS "/MANIFEST:NO")
+target_compile_definitions(sample PRIVATE UNICODE root_DIR=L"${CMAKE_SOURCE_DIR}")
 target_link_libraries(sample shlwapi.lib opengl32.lib ${dep_LIB})
