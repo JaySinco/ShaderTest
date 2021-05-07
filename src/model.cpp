@@ -58,7 +58,7 @@ void Model::zoomTo(float x, float y, float z)
 
 glm::mat4 Model::getModelMatrix() const { return this->translate * this->rotate * this->scale; }
 
-void addMesh(aiMesh *mesh, const aiScene *scene, std::vector<std::shared_ptr<Mesh>> &meshes)
+static std::shared_ptr<Mesh> convert(aiMesh *mesh, const aiScene *scene)
 {
     std::vector<Vertex> vertices;
     std::vector<unsigned> indices;
@@ -80,14 +80,14 @@ void addMesh(aiMesh *mesh, const aiScene *scene, std::vector<std::shared_ptr<Mes
     }
     auto pMesh = std::make_shared<Mesh>();
     pMesh->load(vertices, indices);
-    meshes.push_back(pMesh);
+    return pMesh;
 }
 
-void iterNode(aiNode *node, const aiScene *scene, std::vector<std::shared_ptr<Mesh>> &meshes)
+static void iterNode(aiNode *node, const aiScene *scene, std::vector<std::shared_ptr<Mesh>> &meshes)
 {
     for (unsigned i = 0; i < node->mNumMeshes; i++) {
         aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-        addMesh(mesh, scene, meshes);
+        meshes.push_back(convert(mesh, scene));
     }
     for (unsigned i = 0; i < node->mNumChildren; i++) {
         iterNode(node->mChildren[i], scene, meshes);
