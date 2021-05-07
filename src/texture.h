@@ -8,7 +8,7 @@ class Texture
 public:
     ~Texture();
     bool load(const std::wstring &imageFile);
-    bool use(unsigned idx) const;
+    void use(unsigned idx) const;
 
 private:
     unsigned texture;

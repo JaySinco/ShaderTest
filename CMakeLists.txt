@@ -32,6 +32,7 @@ add_executable(sample
     ${CMAKE_SOURCE_DIR}/src/shader.cpp
     ${CMAKE_SOURCE_DIR}/src/mesh.cpp
     ${CMAKE_SOURCE_DIR}/src/texture.cpp
+    ${CMAKE_SOURCE_DIR}/src/camera.cpp
     ${CMAKE_SOURCE_DIR}/src/main.cpp
 )
 set_target_properties(sample PROPERTIES LINK_FLAGS "/MANIFEST:NO")

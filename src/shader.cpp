@@ -1,5 +1,6 @@
 #include "shader.h"
 #include "utils.h"
+#include <glm/gtc/type_ptr.hpp>
 #include <glad/glad.h>
 #include <filesystem>
 
@@ -41,11 +42,7 @@ bool Shader::load(const std::wstring &vertFile, const std::wstring &fragFile)
     return true;
 }
 
-bool Shader::use() const
-{
-    glUseProgram(this->program);
-    return true;
-}
+void Shader::use() const { glUseProgram(this->program); }
 
 std::pair<bool, unsigned> Shader::compile(const std::wstring &file)
 {
@@ -75,47 +72,27 @@ std::pair<bool, unsigned> Shader::compile(const std::wstring &file)
     return {true, shader};
 }
 
-std::pair<bool, int> Shader::get_loc(const std::string &name) const
+int Shader::get_loc(const std::string &name) const
 {
-    int loc = glGetUniformLocation(this->program, name.c_str());
-    if (loc == -1) {
-        LOG(ERROR) << "failed to get uniform location: " << name;
-        return {false, 0};
-    }
-    return {true, loc};
+    this->use();
+    return glGetUniformLocation(this->program, name.c_str());
 }
 
-bool Shader::set(const std::string &name, int v0) const
+void Shader::set(const std::string &name, int v) const { glUniform1i(this->get_loc(name), v); }
+
+void Shader::set(const std::string &name, const glm::vec3 &v) const
 {
-    auto [ok, loc] = this->get_loc(name);
-    if (!ok) {
-        return false;
-    }
-    glUseProgram(this->program);
-    glUniform1i(loc, v0);
-    return true;
+    glUniform3fv(this->get_loc(name), 1, glm::value_ptr(v));
 }
 
-bool Shader::set(const std::string &name, float v0, float v1, float v2) const
+void Shader::set(const std::string &name, const glm::vec4 &v) const
 {
-    auto [ok, loc] = this->get_loc(name);
-    if (!ok) {
-        return false;
-    }
-    glUseProgram(this->program);
-    glUniform3f(loc, v0, v1, v2);
-    return true;
+    glUniform4fv(this->get_loc(name), 1, glm::value_ptr(v));
 }
 
-bool Shader::set(const std::string &name, float v0, float v1, float v2, float v3) const
+void Shader::set(const std::string &name, const glm::mat4 &v) const
 {
-    auto [ok, loc] = this->get_loc(name);
-    if (!ok) {
-        return false;
-    }
-    glUseProgram(this->program);
-    glUniform4f(loc, v0, v1, v2, v3);
-    return true;
+    glUniformMatrix4fv(this->get_loc(name), 1, GL_FALSE, glm::value_ptr(v));
 }
 
 }  // namespace gl

@@ -35,11 +35,10 @@ bool Texture::load(const std::wstring &imageFile)
     return true;
 }
 
-bool Texture::use(unsigned idx) const
+void Texture::use(unsigned idx) const
 {
     glActiveTexture(GL_TEXTURE0 + idx);
     glBindTexture(GL_TEXTURE_2D, this->texture);
-    return true;
 }
 
 }  // namespace gl

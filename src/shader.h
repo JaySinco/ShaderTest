@@ -1,5 +1,8 @@
 #pragma once
 #include <string>
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
+#include <glm/mat4x4.hpp>
 
 namespace gl
 {
@@ -8,14 +11,15 @@ class Shader
 public:
     ~Shader();
     bool load(const std::wstring &vertFile, const std::wstring &fragFile);
-    bool use() const;
-    bool set(const std::string &name, int v0) const;
-    bool set(const std::string &name, float v0, float v1, float v2) const;
-    bool set(const std::string &name, float v0, float v1, float v2, float v3) const;
+    void use() const;
+    void set(const std::string &name, int v) const;
+    void set(const std::string &name, const glm::vec3 &v) const;
+    void set(const std::string &name, const glm::vec4 &v) const;
+    void set(const std::string &name, const glm::mat4 &v) const;
 
 private:
     static std::pair<bool, unsigned> compile(const std::wstring &file);
-    std::pair<bool, int> get_loc(const std::string &name) const;
+    int get_loc(const std::string &name) const;
     unsigned program;
 };
 
