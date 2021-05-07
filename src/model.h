@@ -10,6 +10,7 @@ class Model
 {
 public:
     Model();
+    Model(const Model &) = delete;
     bool load(const std::wstring &modelFile);
     void draw() const;
     void reset();

@@ -15,11 +15,15 @@ struct Vertex
 class Mesh
 {
 public:
+    Mesh() = default;
+    Mesh(const Mesh &) = delete;
+    Mesh(Mesh &&);
     ~Mesh();
     void load(const std::vector<Vertex> &vertices, const std::vector<unsigned> &indices);
     void draw() const;
 
 private:
+    bool loaded = false;
     unsigned vao, vbo, ebo;
     unsigned indices;
 };

@@ -6,7 +6,12 @@
 
 namespace gl
 {
-Texture::~Texture() { glDeleteTextures(1, &this->texture); }
+Texture::~Texture()
+{
+    if (this->loaded) {
+        glDeleteTextures(1, &this->texture);
+    }
+}
 
 bool Texture::load(const std::wstring &imageFile)
 {
@@ -17,7 +22,7 @@ bool Texture::load(const std::wstring &imageFile)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     int width, height, channel;
-    stbi_set_flip_vertically_on_load(true);
+    // stbi_set_flip_vertically_on_load(true);
     std::string path = utils::ws2s(imageFile);
     unsigned char *data = stbi_load(path.c_str(), &width, &height, &channel, 0);
     if (data == nullptr) {
@@ -32,6 +37,7 @@ bool Texture::load(const std::wstring &imageFile)
     glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
     stbi_image_free(data);
+    this->loaded = true;
     return true;
 }
 

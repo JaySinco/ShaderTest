@@ -4,11 +4,12 @@
 #include "model.h"
 #include "texture.h"
 #include "camera.h"
+#include <glm/gtx/string_cast.hpp>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-const int g_Width = 400;
-const int g_Height = 300;
+const int g_Width = 800;
+const int g_Height = 600;
 const float g_InitCameraZ = 3.0f;
 
 double g_LastMouseX = 0.0;
@@ -93,6 +94,10 @@ int main(int argc, char **argv)
         return -1;
     }
 
+    glEnable(GL_DEPTH_TEST);
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
+
     gl::Shader basicShader;
     if (!basicShader.load(root_DIR L"/shaders/vertex/basic.vert",
                           root_DIR L"/shaders/fragment/basic.frag")) {
@@ -111,10 +116,8 @@ int main(int argc, char **argv)
     g_Camera.moveTo(0, 0, g_InitCameraZ);
 
     while (!glfwWindowShouldClose(window)) {
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         basicShader.set("uf_ModelViewProjectionMatrix",
                         g_Camera.getViewProjectionMatrix() * g_Model.getModelMatrix());
         g_Model.draw();

@@ -1,6 +1,5 @@
 #version 330 core
 
-in vec3 io_Color;
 in vec2 io_TexCoord;
 
 out vec4 frag_Color;

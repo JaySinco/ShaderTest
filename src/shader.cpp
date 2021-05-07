@@ -6,7 +6,12 @@
 
 namespace gl
 {
-Shader::~Shader() { glDeleteProgram(this->program); }
+Shader::~Shader()
+{
+    if (this->loaded) {
+        glDeleteProgram(this->program);
+    }
+}
 
 bool Shader::load(const std::wstring &vertFile, const std::wstring &fragFile)
 {
@@ -39,6 +44,7 @@ bool Shader::load(const std::wstring &vertFile, const std::wstring &fragFile)
         return false;
     }
 
+    this->loaded = true;
     return true;
 }
 

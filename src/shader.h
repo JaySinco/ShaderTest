@@ -9,6 +9,8 @@ namespace gl
 class Shader
 {
 public:
+    Shader() = default;
+    Shader(const Shader &) = delete;
     ~Shader();
     bool load(const std::wstring &vertFile, const std::wstring &fragFile);
     void use() const;
@@ -20,6 +22,7 @@ public:
 private:
     static std::pair<bool, unsigned> compile(const std::wstring &file);
     int get_loc(const std::string &name) const;
+    bool loaded = false;
     unsigned program;
 };
 

@@ -25,7 +25,7 @@ void Model::reset()
 
 void Model::move(float dx, float dy, float dz)
 {
-    this->translate = glm::translate(this->translate, glm::vec3(dx, dy, dz));
+    this->translate = glm::translate(glm::mat4(1.0f), glm::vec3(dx, dy, dz)) * this->translate;
 }
 
 void Model::moveTo(float x, float y, float z)
@@ -36,7 +36,8 @@ void Model::moveTo(float x, float y, float z)
 void Model::spin(float ddegree, float axis_x, float axis_y, float axis_z)
 {
     this->rotate =
-        glm::rotate(this->rotate, glm::radians(ddegree), glm::vec3(axis_x, axis_y, axis_z));
+        glm::rotate(glm::mat4(1.0f), glm::radians(ddegree), glm::vec3(axis_x, axis_y, axis_z)) *
+        this->rotate;
 }
 
 void Model::spinTo(float degree, float axis_x, float axis_y, float axis_z)
@@ -47,7 +48,7 @@ void Model::spinTo(float degree, float axis_x, float axis_y, float axis_z)
 
 void Model::zoom(float dx, float dy, float dz)
 {
-    this->scale = glm::scale(this->scale, glm::vec3(dx, dy, dz));
+    this->scale = glm::scale(glm::mat4(1.0f), glm::vec3(dx, dy, dz)) * this->scale;
 }
 
 void Model::zoomTo(float x, float y, float z)
@@ -57,7 +58,7 @@ void Model::zoomTo(float x, float y, float z)
 
 glm::mat4 Model::getModelMatrix() const { return this->translate * this->rotate * this->scale; }
 
-Mesh convMesh(aiMesh *mesh, const aiScene *scene)
+void addMesh(aiMesh *mesh, const aiScene *scene, std::vector<Mesh> &meshes)
 {
     std::vector<Vertex> vertices;
     std::vector<unsigned> indices;
@@ -77,16 +78,15 @@ Mesh convMesh(aiMesh *mesh, const aiScene *scene)
         aiFace face = mesh->mFaces[i];
         for (unsigned j = 0; j < face.mNumIndices; j++) indices.push_back(face.mIndices[j]);
     }
-    Mesh rMesh;
-    rMesh.load(vertices, indices);
-    return rMesh;
+    Mesh &back = meshes.emplace_back();
+    back.load(vertices, indices);
 }
 
 void iterNode(aiNode *node, const aiScene *scene, std::vector<Mesh> &meshes)
 {
     for (unsigned i = 0; i < node->mNumMeshes; i++) {
         aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-        meshes.push_back(convMesh(mesh, scene));
+        addMesh(mesh, scene, meshes);
     }
     for (unsigned i = 0; i < node->mNumChildren; i++) {
         iterNode(node->mChildren[i], scene, meshes);
@@ -97,9 +97,8 @@ bool Model::load(const std::wstring &modelFile)
 {
     Assimp::Importer importer;
     std::string path = utils::ws2s(modelFile);
-    const aiScene *scene =
-        importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals |
-                                    aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+    const aiScene *scene = importer.ReadFile(
+        path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace);
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
         LOG(ERROR) << "failed to import model: " << importer.GetErrorString();
         return false;
