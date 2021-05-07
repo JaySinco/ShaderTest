@@ -17,6 +17,7 @@ include_directories(AFTER
     ${CMAKE_SOURCE_DIR}/deps/fmt/include/
     ${CMAKE_SOURCE_DIR}/deps/glm/include/
     ${CMAKE_SOURCE_DIR}/deps/stb/include/
+    ${CMAKE_SOURCE_DIR}/deps/assimp/include/
 )
 
 set(dep_LIB
@@ -24,6 +25,9 @@ set(dep_LIB
     ${CMAKE_SOURCE_DIR}/deps/glog/lib/glog.lib
     ${CMAKE_SOURCE_DIR}/deps/glfw/lib/glfw3.lib
     ${CMAKE_SOURCE_DIR}/deps/fmt/lib/fmt.lib
+    ${CMAKE_SOURCE_DIR}/deps/assimp/lib/assimp-vc142-mt.lib
+    ${CMAKE_SOURCE_DIR}/deps/assimp/lib/IrrXML.lib
+    ${CMAKE_SOURCE_DIR}/deps/assimp/lib/zlibstatic.lib
 )
 
 add_executable(sample
@@ -31,9 +35,10 @@ add_executable(sample
     ${CMAKE_SOURCE_DIR}/src/utils.cpp
     ${CMAKE_SOURCE_DIR}/src/shader.cpp
     ${CMAKE_SOURCE_DIR}/src/mesh.cpp
+    ${CMAKE_SOURCE_DIR}/src/model.cpp
     ${CMAKE_SOURCE_DIR}/src/texture.cpp
     ${CMAKE_SOURCE_DIR}/src/camera.cpp
-    ${CMAKE_SOURCE_DIR}/src/main.cpp
+    ${CMAKE_SOURCE_DIR}/src/sample.cpp
 )
 set_target_properties(sample PROPERTIES LINK_FLAGS "/MANIFEST:NO")
 target_compile_definitions(sample PRIVATE UNICODE root_DIR=L"${CMAKE_SOURCE_DIR}")

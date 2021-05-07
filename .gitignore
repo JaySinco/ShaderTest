@@ -7,4 +7,4 @@
 /deps/*/src/*
 !/deps/*/src/make.bat
 
-/images
+/models

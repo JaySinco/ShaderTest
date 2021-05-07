@@ -23,6 +23,7 @@
         "${workspaceFolder}/deps/fmt/include/",
         "${workspaceFolder}/deps/glm/include/",
         "${workspaceFolder}/deps/stb/include/",
+        "${workspaceFolder}/deps/assimp/include/",
     ],
     "C_Cpp.default.defines": [
         "UNICODE",

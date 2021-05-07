@@ -1,6 +1,7 @@
 #include "utils.h"
 #include "shader.h"
 #include "mesh.h"
+#include "model.h"
 #include "texture.h"
 #include "camera.h"
 #include <glad/glad.h>
@@ -14,7 +15,7 @@ double g_LastMouseX = 0.0;
 double g_LastMouseY = 0.0;
 bool g_LMousePressed = false;
 
-gl::Mesh g_Mesh;
+gl::Model g_Model;
 gl::Camera g_Camera(static_cast<float>(g_Width) / g_Height);
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height)
@@ -43,7 +44,7 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
     if (button == GLFW_MOUSE_BUTTON_RIGHT) {
         switch (action) {
             case GLFW_PRESS:
-                g_Mesh.reset();
+                g_Model.reset();
                 g_Camera.moveTo(0, 0, g_InitCameraZ);
                 break;
         }
@@ -56,7 +57,7 @@ void cursor_pos_callback(GLFWwindow *window, double xpos, double ypos)
         float dx = float(xpos - g_LastMouseX);
         float dy = float(ypos - g_LastMouseY);
         float dz = std::hypot(dx, dy);
-        g_Mesh.spin(float(0.15 * dz), dy, dx, 0);
+        g_Model.spin(float(0.15 * dz), dy, dx, 0);
     }
     g_LastMouseX = xpos;
     g_LastMouseY = ypos;
@@ -98,44 +99,25 @@ int main(int argc, char **argv)
         LOG(ERROR) << "failed to load shader: basic";
         return -1;
     }
-
-    float vertices[] = {
-        // positions          // colors           // texture coords
-        0.5f,  0.5f,  0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,  // top right
-        0.5f,  -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,  // bottom right
-        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,  // bottom left
-        -0.5f, 0.5f,  0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f   // top left
-    };
-    unsigned indices[] = {
-        0, 1, 3,  // first triangle
-        1, 2, 3   // second triangle
-    };
-    g_Mesh.load(sizeof(vertices) / sizeof(float), vertices, sizeof(indices) / sizeof(unsigned),
-                indices);
-
-    gl::Texture container, awesomeface;
-    if (!container.load(root_DIR L"/images/container.jpg")) {
-        LOG(ERROR) << "failed to load texture: container";
+    if (!g_Model.load(root_DIR L"/models/backpack/backpack.obj")) {
         return -1;
     }
-    if (!awesomeface.load(root_DIR L"/images/awesomeface.png")) {
-        LOG(ERROR) << "failed to load texture: awesomeface";
+    gl::Texture diffuse;
+    if (!diffuse.load(root_DIR L"/models/backpack/diffuse.jpg")) {
         return -1;
     }
-    container.use(0);
-    awesomeface.use(1);
+    diffuse.use(0);
     basicShader.set("uf_Texture0", 0);
-    basicShader.set("uf_Texture1", 1);
     g_Camera.moveTo(0, 0, g_InitCameraZ);
 
     while (!glfwWindowShouldClose(window)) {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         basicShader.set("uf_ModelViewProjectionMatrix",
-                        g_Camera.getViewProjectionMatrix() * g_Mesh.getModelMatrix());
-        g_Mesh.draw();
+                        g_Camera.getViewProjectionMatrix() * g_Model.getModelMatrix());
+        g_Model.draw();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
