@@ -12,7 +12,7 @@ Model::Model() { this->reset(); }
 void Model::draw() const
 {
     for (const auto &mesh: this->meshes) {
-        mesh.draw();
+        mesh->draw();
     }
 }
 
@@ -58,7 +58,7 @@ void Model::zoomTo(float x, float y, float z)
 
 glm::mat4 Model::getModelMatrix() const { return this->translate * this->rotate * this->scale; }
 
-void addMesh(aiMesh *mesh, const aiScene *scene, std::vector<Mesh> &meshes)
+void addMesh(aiMesh *mesh, const aiScene *scene, std::vector<std::shared_ptr<Mesh>> &meshes)
 {
     std::vector<Vertex> vertices;
     std::vector<unsigned> indices;
@@ -78,11 +78,12 @@ void addMesh(aiMesh *mesh, const aiScene *scene, std::vector<Mesh> &meshes)
         aiFace face = mesh->mFaces[i];
         for (unsigned j = 0; j < face.mNumIndices; j++) indices.push_back(face.mIndices[j]);
     }
-    Mesh &back = meshes.emplace_back();
-    back.load(vertices, indices);
+    auto pMesh = std::make_shared<Mesh>();
+    pMesh->load(vertices, indices);
+    meshes.push_back(pMesh);
 }
 
-void iterNode(aiNode *node, const aiScene *scene, std::vector<Mesh> &meshes)
+void iterNode(aiNode *node, const aiScene *scene, std::vector<std::shared_ptr<Mesh>> &meshes)
 {
     for (unsigned i = 0; i < node->mNumMeshes; i++) {
         aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];

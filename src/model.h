@@ -2,6 +2,7 @@
 #include "mesh.h"
 #include <vector>
 #include <string>
+#include <memory>
 #include <glm/mat4x4.hpp>
 
 namespace gl
@@ -10,7 +11,6 @@ class Model
 {
 public:
     Model();
-    Model(const Model &) = delete;
     bool load(const std::wstring &modelFile);
     void draw() const;
     void reset();
@@ -23,7 +23,7 @@ public:
     glm::mat4 getModelMatrix() const;
 
 private:
-    std::vector<Mesh> meshes;
+    std::vector<std::shared_ptr<Mesh>> meshes;
     glm::mat4 translate, rotate, scale;
 };
 

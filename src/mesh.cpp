@@ -12,16 +12,6 @@ Mesh::~Mesh()
     }
 }
 
-Mesh::Mesh(Mesh &&rhs)
-{
-    this->loaded = rhs.loaded;
-    this->vao = rhs.vao;
-    this->vbo = rhs.vbo;
-    this->ebo = rhs.ebo;
-    this->indices = rhs.indices;
-    rhs.loaded = false;
-}
-
 void Mesh::load(const std::vector<Vertex> &vertices, const std::vector<unsigned> &indices)
 {
     glGenVertexArrays(1, &this->vao);

@@ -29,6 +29,7 @@ bool Texture::load(const std::wstring &imageFile)
         LOG(ERROR) << "failed to load image: " << path;
         return false;
     }
+    std::shared_ptr<void> data_guard(nullptr, [=](void *) { stbi_image_free(data); });
     if (channel != 3 && channel != 4) {
         LOG(ERROR) << "invalid image channel: " << channel;
         return false;
@@ -36,7 +37,6 @@ bool Texture::load(const std::wstring &imageFile)
     int format = channel == 3 ? GL_RGB : GL_RGBA;
     glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
-    stbi_image_free(data);
     this->loaded = true;
     return true;
 }
