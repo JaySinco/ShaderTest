@@ -73,7 +73,6 @@ static std::shared_ptr<Mesh> convert(aiMesh *mesh, const aiScene *scene)
         }
         vertices.push_back(vt);
     }
-
     for (unsigned i = 0; i < mesh->mNumFaces; i++) {
         aiFace face = mesh->mFaces[i];
         for (unsigned j = 0; j < face.mNumIndices; j++) indices.push_back(face.mIndices[j]);
