@@ -8,26 +8,30 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-const int g_Width = 400;
-const int g_Height = 300;
-const float g_InitCameraZ = 3.0f;
+struct
+{
+    struct
+    {
+        double lastMouseX = 0.0;
+        double lastMouseY = 0.0;
+        bool leftMousePressed = false;
+    } trackball;
 
-double g_LastMouseX = 0.0;
-double g_LastMouseY = 0.0;
-bool g_LMousePressed = false;
-
-gl::Model g_Model;
-gl::Camera g_Camera(static_cast<float>(g_Width) / g_Height);
+    const int width = 400;
+    const int height = 300;
+    gl::Camera camera{float(width) / height};
+} g;
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 {
+    g.camera.adaptToScreen(width, height);
     glViewport(0, 0, width, height);
 }
 
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
 {
     double sensitivity = 0.3;
-    g_Camera.move(gl::Camera::Forward, yoffset * sensitivity);
+    g.camera.move(gl::Camera::Forward, yoffset * sensitivity);
 }
 
 void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
@@ -35,18 +39,17 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
     if (button == GLFW_MOUSE_BUTTON_LEFT) {
         switch (action) {
             case GLFW_PRESS:
-                g_LMousePressed = true;
+                g.trackball.leftMousePressed = true;
                 break;
             case GLFW_RELEASE:
-                g_LMousePressed = false;
+                g.trackball.leftMousePressed = false;
                 break;
         }
     }
     if (button == GLFW_MOUSE_BUTTON_RIGHT) {
         switch (action) {
             case GLFW_PRESS:
-                g_Model.reset();
-                g_Camera.moveTo(0, 0, g_InitCameraZ);
+                g.camera.reset();
                 break;
         }
     }
@@ -54,14 +57,14 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
 
 void cursor_pos_callback(GLFWwindow *window, double xpos, double ypos)
 {
-    if (g_LMousePressed) {
-        float dx = float(xpos - g_LastMouseX);
-        float dy = float(ypos - g_LastMouseY);
-        float dz = std::hypot(dx, dy);
-        g_Model.spin(float(0.15 * dz), dy, dx, 0);
+    if (g.trackball.leftMousePressed) {
+        float dx = float(xpos - g.trackball.lastMouseX);
+        float dy = float(ypos - g.trackball.lastMouseY);
+        g.camera.shake(0.15 * dx);
+        g.camera.nod(-0.15 * dy);
     }
-    g_LastMouseX = xpos;
-    g_LastMouseY = ypos;
+    g.trackball.lastMouseX = xpos;
+    g.trackball.lastMouseY = ypos;
 }
 
 void debug_message_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
@@ -84,7 +87,7 @@ int main(int argc, char **argv)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 
-    GLFWwindow *window = glfwCreateWindow(g_Width, g_Height, "Sample", nullptr, nullptr);
+    GLFWwindow *window = glfwCreateWindow(g.width, g.height, "Sample", nullptr, nullptr);
     if (window == nullptr) {
         LOG(ERROR) << "failed to create glfw window";
         return -1;
@@ -111,7 +114,8 @@ int main(int argc, char **argv)
                           root_DIR L"/shaders/fragment/basic.frag")) {
         return -1;
     }
-    if (!g_Model.load(root_DIR L"/models/backpack/backpack.obj")) {
+    gl::Model model;
+    if (!model.load(root_DIR L"/models/backpack/backpack.obj")) {
         return -1;
     }
     gl::Texture diffuse;
@@ -120,14 +124,13 @@ int main(int argc, char **argv)
     }
     diffuse.use(0);
     basicShader.set("uf_Texture0", 0);
-    g_Camera.moveTo(0, 0, g_InitCameraZ);
 
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         basicShader.set("uf_ModelViewProjectionMatrix",
-                        g_Camera.getViewProjectionMatrix() * g_Model.getModelMatrix());
-        g_Model.draw();
+                        g.camera.getViewProjectionMatrix() * model.getModelMatrix());
+        model.draw();
 
         glfwSwapBuffers(window);
         glfwPollEvents();

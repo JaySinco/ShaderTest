@@ -7,9 +7,22 @@
 
 namespace gl
 {
-Camera::Camera(float aspect, float near, float far, float fov)
+Camera::Camera(float aspect, glm::vec3 initPos, float near, float far, float fov)
+    : aspect(aspect), initPos(initPos), near(near), far(far), fov(fov)
 {
-    this->projection = glm::perspective(glm::radians(fov), aspect, near, far);
+    this->reset();
+}
+
+void Camera::reset()
+{
+    this->pos = this->initPos;
+    this->yaw = -90.0f;
+    this->pitch = 0.0f;
+}
+
+void Camera::adaptToScreen(int width, int height)
+{
+    this->aspect = static_cast<float>(width) / height;
 }
 
 void Camera::move(Face face, float distance)
@@ -62,7 +75,10 @@ glm::mat4 Camera::getViewMatrix() const
     return glm::lookAt(this->pos, this->pos + axis.front, axis.up);
 }
 
-glm::mat4 Camera::getProjectionMatrix() const { return this->projection; }
+glm::mat4 Camera::getProjectionMatrix() const
+{
+    return glm::perspective(glm::radians(this->fov), this->aspect, this->near, this->far);
+}
 
 glm::mat4 Camera::getViewProjectionMatrix() const
 {

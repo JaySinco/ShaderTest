@@ -14,7 +14,10 @@ public:
         Left,
         Right
     };
-    Camera(float aspect, float near = 0.1f, float far = 100.0f, float fov = 45.0f);
+    Camera(float aspect, glm::vec3 initPos = glm::vec3(0.0f, 0.0f, 3.0f), float near = 0.1f,
+           float far = 100.0f, float fov = 45.0f);
+    void reset();
+    void adaptToScreen(int width, int height);
     void move(Face face, float distance);
     void moveTo(float x, float y, float z);
     void shake(float degree);
@@ -31,10 +34,11 @@ private:
         glm::vec3 front, right, up;
     };
     Axis getAxis() const;
+    const glm::vec3 initPos;
+    const float near, far, fov;
+    float aspect;
     glm::vec3 pos;
-    glm::mat4 projection;
-    float yaw = -90.0f;
-    float pitch = 0.0f;
+    float yaw, pitch;
 };
 
 }  // namespace gl
