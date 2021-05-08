@@ -1,4 +1,5 @@
 #pragma once
+#include "shader.h"
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 
@@ -27,6 +28,7 @@ public:
     void shakeTo(float degree);
     void nod(float ddegree);
     void nodTo(float degree);
+    void use(Shader &shader) const;
     glm::mat4 getViewMatrix() const;
     glm::mat4 getProjectionMatrix() const;
     glm::mat4 getViewProjectionMatrix() const;

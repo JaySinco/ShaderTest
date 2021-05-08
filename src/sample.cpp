@@ -66,34 +66,37 @@ int main(int argc, char **argv)
     glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
     glDebugMessageCallback(debug_message_callback, nullptr);
 
-    gl::Shader basicShader;
-    if (!basicShader.load(root_DIR L"/shaders/vertex/basic.vert",
-                          root_DIR L"/shaders/fragment/basic.frag")) {
+    gl::Shader basic;
+    if (!basic.load(root_DIR L"/shaders/vertex/basic.vert",
+                    root_DIR L"/shaders/fragment/basic.frag")) {
         return -1;
     }
     gl::Model model;
     if (!model.load(root_DIR L"/models/backpack/backpack.obj")) {
         return -1;
     }
+
     gl::Texture diffuse;
     if (!diffuse.load(root_DIR L"/models/backpack/diffuse.jpg", false)) {
         return -1;
     }
-    diffuse.use(0);
-    basicShader.set("uf_Texture0", 0);
 
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        basicShader.set("uf_ModelViewProjectionMatrix",
-                        g.camera.getViewProjectionMatrix() * model.getModelMatrix());
-        model.draw();
-
+        g.camera.use(basic);
+        diffuse.use(0, basic);
+        model.draw(basic);
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
     return 0;
+}
+
+void debug_message_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
+                            const GLchar *message, const void *userParam)
+{
+    LOG(ERROR) << message;
 }
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height)
@@ -151,10 +154,4 @@ void cursor_pos_callback(GLFWwindow *window, double xpos, double ypos)
     }
     g.trackball.lastMouseX = xpos;
     g.trackball.lastMouseY = ypos;
-}
-
-void debug_message_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
-                            const GLchar *message, const void *userParam)
-{
-    LOG(ERROR) << message;
 }

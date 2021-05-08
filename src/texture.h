@@ -1,4 +1,5 @@
 #pragma once
+#include "shader.h"
 #include <string>
 
 namespace gl
@@ -10,7 +11,7 @@ public:
     Texture(const Texture &) = delete;
     ~Texture();
     bool load(const std::wstring &imageFile, bool flip_vertically = false);
-    void use(unsigned idx) const;
+    void use(unsigned idx, Shader &shader) const;
 
 private:
     bool loaded = false;

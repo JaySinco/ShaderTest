@@ -9,8 +9,9 @@ namespace gl
 {
 Model::Model() { this->reset(); }
 
-void Model::draw() const
+void Model::draw(Shader &shader) const
 {
+    shader.set("uf_ModelMatrix", this->getModelMatrix());
     for (const auto &mesh: this->meshes) {
         mesh->draw();
     }

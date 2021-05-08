@@ -1,5 +1,6 @@
 #pragma once
 #include "mesh.h"
+#include "shader.h"
 #include <vector>
 #include <string>
 #include <memory>
@@ -12,7 +13,6 @@ class Model
 public:
     Model();
     bool load(const std::wstring &modelFile);
-    void draw() const;
     void reset();
     void move(float dx, float dy, float dz);
     void moveTo(float x, float y, float z);
@@ -20,6 +20,7 @@ public:
     void spinTo(float degree, float axis_x, float axis_y, float axis_z);
     void zoom(float dx, float dy, float dz);
     void zoomTo(float x, float y, float z);
+    void draw(Shader &shader) const;
     glm::mat4 getModelMatrix() const;
 
 private:
