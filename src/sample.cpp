@@ -1,6 +1,5 @@
 #include "utils.h"
 #include "shader.h"
-#include "mesh.h"
 #include "model.h"
 #include "texture.h"
 #include "camera.h"
@@ -75,7 +74,6 @@ int main(int argc, char **argv)
     if (!model.load(root_DIR L"/models/backpack/backpack.obj")) {
         return -1;
     }
-
     gl::Texture diffuse;
     if (!diffuse.load(root_DIR L"/models/backpack/diffuse.jpg", false)) {
         return -1;
