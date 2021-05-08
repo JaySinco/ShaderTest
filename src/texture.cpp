@@ -41,7 +41,7 @@ bool Texture::load(const std::wstring &imageFile, bool flip_vertically)
     return true;
 }
 
-void Texture::use(unsigned idx, Shader &shader) const
+void Texture::use(Shader &shader, unsigned idx) const
 {
     glActiveTexture(GL_TEXTURE0 + idx);
     shader.set(fmt::format("uf_Texture{}", idx), idx);

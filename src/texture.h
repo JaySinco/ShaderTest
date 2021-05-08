@@ -11,7 +11,7 @@ public:
     Texture(const Texture &) = delete;
     ~Texture();
     bool load(const std::wstring &imageFile, bool flip_vertically = false);
-    void use(unsigned idx, Shader &shader) const;
+    void use(Shader &shader, unsigned idx) const;
 
 private:
     bool loaded = false;

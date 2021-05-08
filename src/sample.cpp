@@ -26,6 +26,7 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
 void mouse_button_callback(GLFWwindow *window, int button, int action, int mods);
 void cursor_pos_callback(GLFWwindow *window, double xpos, double ypos);
+void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
 void debug_message_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
                             const GLchar *message, const void *userParam);
 
@@ -53,7 +54,7 @@ int main(int argc, char **argv)
     glfwSetScrollCallback(window, scroll_callback);
     glfwSetCursorPosCallback(window, cursor_pos_callback);
     glfwSetMouseButtonCallback(window, mouse_button_callback);
-    // glfwSetKeyCallback(window, key_callback);
+    glfwSetKeyCallback(window, key_callback);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         LOG(ERROR) << "failed to init glad loader";
@@ -82,7 +83,7 @@ int main(int argc, char **argv)
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         g.camera.use(basic);
-        diffuse.use(0, basic);
+        diffuse.use(basic, 0);
         model.draw(basic);
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -111,30 +112,34 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
 
 void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
 {
-    if (button == GLFW_MOUSE_BUTTON_LEFT) {
-        switch (action) {
-            case GLFW_PRESS:
-                g.trackball.leftMousePressed = true;
-                break;
-            case GLFW_RELEASE:
-                g.trackball.leftMousePressed = false;
-                break;
-        }
-    } else if (button == GLFW_MOUSE_BUTTON_MIDDLE) {
-        switch (action) {
-            case GLFW_PRESS:
-                g.trackball.middleMousePressed = true;
-                break;
-            case GLFW_RELEASE:
-                g.trackball.middleMousePressed = false;
-                break;
-        }
-    } else if (button == GLFW_MOUSE_BUTTON_RIGHT) {
-        switch (action) {
-            case GLFW_PRESS:
-                g.camera.reset();
-                break;
-        }
+    switch (button) {
+        case GLFW_MOUSE_BUTTON_LEFT:
+            switch (action) {
+                case GLFW_PRESS:
+                    g.trackball.leftMousePressed = true;
+                    break;
+                case GLFW_RELEASE:
+                    g.trackball.leftMousePressed = false;
+                    break;
+            }
+            break;
+        case GLFW_MOUSE_BUTTON_MIDDLE:
+            switch (action) {
+                case GLFW_PRESS:
+                    g.trackball.middleMousePressed = true;
+                    break;
+                case GLFW_RELEASE:
+                    g.trackball.middleMousePressed = false;
+                    break;
+            }
+            break;
+        case GLFW_MOUSE_BUTTON_RIGHT:
+            switch (action) {
+                case GLFW_PRESS:
+                    g.camera.reset();
+                    break;
+            }
+            break;
     }
 }
 
@@ -142,14 +147,29 @@ void cursor_pos_callback(GLFWwindow *window, double xpos, double ypos)
 {
     float dx = float(xpos - g.trackball.lastMouseX);
     float dy = float(ypos - g.trackball.lastMouseY);
-    if (g.trackball.leftMousePressed) {
+    if (g.trackball.middleMousePressed) {
         g.camera.shake(0.15 * dx);
         g.camera.nod(-0.15 * dy);
     }
-    if (g.trackball.middleMousePressed) {
+    if (g.trackball.leftMousePressed) {
         g.camera.move(gl::Camera::Right, -0.01 * dx);
         g.camera.move(gl::Camera::Up, 0.01 * dy);
     }
     g.trackball.lastMouseX = xpos;
     g.trackball.lastMouseY = ypos;
+}
+
+void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
+{
+    static bool wireframe = false;
+    switch (key) {
+        case GLFW_KEY_L:
+            switch (action) {
+                case GLFW_PRESS:
+                    wireframe = !wireframe;
+                    glPolygonMode(GL_FRONT_AND_BACK, wireframe ? GL_LINE : GL_FILL);
+                    break;
+            }
+            break;
+    }
 }
