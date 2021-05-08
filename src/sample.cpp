@@ -8,8 +8,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-const int g_Width = 800;
-const int g_Height = 600;
+const int g_Width = 400;
+const int g_Height = 300;
 const float g_InitCameraZ = 3.0f;
 
 double g_LastMouseX = 0.0;
@@ -64,6 +64,12 @@ void cursor_pos_callback(GLFWwindow *window, double xpos, double ypos)
     g_LastMouseY = ypos;
 }
 
+void debug_message_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
+                            const GLchar *message, const void *userParam)
+{
+    LOG(ERROR) << message;
+}
+
 int main(int argc, char **argv)
 {
     FLAGS_logtostderr = 1;
@@ -73,9 +79,10 @@ int main(int argc, char **argv)
 
     glfwInit();
     std::shared_ptr<void> glfw_guard(nullptr, [](void *) { glfwTerminate(); });
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 
     GLFWwindow *window = glfwCreateWindow(g_Width, g_Height, "Sample", nullptr, nullptr);
     if (window == nullptr) {
@@ -90,18 +97,18 @@ int main(int argc, char **argv)
     // glfwSetKeyCallback(window, key_callback);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-        LOG(ERROR) << "failed to init glad";
+        LOG(ERROR) << "failed to init glad loader";
         return -1;
     }
 
     glEnable(GL_DEPTH_TEST);
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
+    glDebugMessageCallback(debug_message_callback, nullptr);
 
     gl::Shader basicShader;
     if (!basicShader.load(root_DIR L"/shaders/vertex/basic.vert",
                           root_DIR L"/shaders/fragment/basic.frag")) {
-        LOG(ERROR) << "failed to load shader: basic";
         return -1;
     }
     if (!g_Model.load(root_DIR L"/models/backpack/backpack.obj")) {
