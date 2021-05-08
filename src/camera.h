@@ -12,17 +12,20 @@ public:
         Forward,
         Backward,
         Left,
-        Right
+        Right,
+        Up,
+        Down,
     };
     Camera(float aspect, glm::vec3 initPos = glm::vec3(0.0f, 0.0f, 3.0f), float near = 0.1f,
            float far = 100.0f, float fov = 45.0f);
     void reset();
     void adaptToScreen(int width, int height);
     void move(Face face, float distance);
+    void move(float dx, float dy, float dz);
     void moveTo(float x, float y, float z);
-    void shake(float degree);
+    void shake(float ddegree);
     void shakeTo(float degree);
-    void nod(float degree);
+    void nod(float ddegree);
     void nodTo(float degree);
     glm::mat4 getViewMatrix() const;
     glm::mat4 getProjectionMatrix() const;

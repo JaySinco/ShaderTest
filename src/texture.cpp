@@ -13,7 +13,7 @@ Texture::~Texture()
     }
 }
 
-bool Texture::load(const std::wstring &imageFile)
+bool Texture::load(const std::wstring &imageFile, bool flip_vertically)
 {
     glGenTextures(1, &this->texture);
     glBindTexture(GL_TEXTURE_2D, this->texture);
@@ -22,7 +22,7 @@ bool Texture::load(const std::wstring &imageFile)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     int width, height, channel;
-    // stbi_set_flip_vertically_on_load(true);
+    stbi_set_flip_vertically_on_load(flip_vertically);
     std::string path = utils::ws2s(imageFile);
     unsigned char *data = stbi_load(path.c_str(), &width, &height, &channel, 0);
     if (data == nullptr) {

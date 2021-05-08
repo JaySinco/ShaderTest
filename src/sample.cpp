@@ -15,6 +15,7 @@ struct
         double lastMouseX = 0.0;
         double lastMouseY = 0.0;
         bool leftMousePressed = false;
+        bool middleMousePressed = false;
     } trackball;
 
     const int width = 400;
@@ -22,56 +23,12 @@ struct
     gl::Camera camera{float(width) / height};
 } g;
 
-void framebuffer_size_callback(GLFWwindow *window, int width, int height)
-{
-    g.camera.adaptToScreen(width, height);
-    glViewport(0, 0, width, height);
-}
-
-void scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
-{
-    double sensitivity = 0.3;
-    g.camera.move(gl::Camera::Forward, yoffset * sensitivity);
-}
-
-void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
-{
-    if (button == GLFW_MOUSE_BUTTON_LEFT) {
-        switch (action) {
-            case GLFW_PRESS:
-                g.trackball.leftMousePressed = true;
-                break;
-            case GLFW_RELEASE:
-                g.trackball.leftMousePressed = false;
-                break;
-        }
-    }
-    if (button == GLFW_MOUSE_BUTTON_RIGHT) {
-        switch (action) {
-            case GLFW_PRESS:
-                g.camera.reset();
-                break;
-        }
-    }
-}
-
-void cursor_pos_callback(GLFWwindow *window, double xpos, double ypos)
-{
-    if (g.trackball.leftMousePressed) {
-        float dx = float(xpos - g.trackball.lastMouseX);
-        float dy = float(ypos - g.trackball.lastMouseY);
-        g.camera.shake(0.15 * dx);
-        g.camera.nod(-0.15 * dy);
-    }
-    g.trackball.lastMouseX = xpos;
-    g.trackball.lastMouseY = ypos;
-}
-
+void framebuffer_size_callback(GLFWwindow *window, int width, int height);
+void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
+void mouse_button_callback(GLFWwindow *window, int button, int action, int mods);
+void cursor_pos_callback(GLFWwindow *window, double xpos, double ypos);
 void debug_message_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
-                            const GLchar *message, const void *userParam)
-{
-    LOG(ERROR) << message;
-}
+                            const GLchar *message, const void *userParam);
 
 int main(int argc, char **argv)
 {
@@ -119,7 +76,7 @@ int main(int argc, char **argv)
         return -1;
     }
     gl::Texture diffuse;
-    if (!diffuse.load(root_DIR L"/models/backpack/diffuse.jpg")) {
+    if (!diffuse.load(root_DIR L"/models/backpack/diffuse.jpg", false)) {
         return -1;
     }
     diffuse.use(0);
@@ -137,4 +94,67 @@ int main(int argc, char **argv)
     }
 
     return 0;
+}
+
+void framebuffer_size_callback(GLFWwindow *window, int width, int height)
+{
+    g.camera.adaptToScreen(width, height);
+    glViewport(0, 0, width, height);
+}
+
+void scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
+{
+    double sensitivity = 0.3;
+    g.camera.move(gl::Camera::Forward, yoffset * sensitivity);
+}
+
+void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
+{
+    if (button == GLFW_MOUSE_BUTTON_LEFT) {
+        switch (action) {
+            case GLFW_PRESS:
+                g.trackball.leftMousePressed = true;
+                break;
+            case GLFW_RELEASE:
+                g.trackball.leftMousePressed = false;
+                break;
+        }
+    } else if (button == GLFW_MOUSE_BUTTON_MIDDLE) {
+        switch (action) {
+            case GLFW_PRESS:
+                g.trackball.middleMousePressed = true;
+                break;
+            case GLFW_RELEASE:
+                g.trackball.middleMousePressed = false;
+                break;
+        }
+    } else if (button == GLFW_MOUSE_BUTTON_RIGHT) {
+        switch (action) {
+            case GLFW_PRESS:
+                g.camera.reset();
+                break;
+        }
+    }
+}
+
+void cursor_pos_callback(GLFWwindow *window, double xpos, double ypos)
+{
+    float dx = float(xpos - g.trackball.lastMouseX);
+    float dy = float(ypos - g.trackball.lastMouseY);
+    if (g.trackball.leftMousePressed) {
+        g.camera.shake(0.15 * dx);
+        g.camera.nod(-0.15 * dy);
+    }
+    if (g.trackball.middleMousePressed) {
+        g.camera.move(gl::Camera::Right, -0.01 * dx);
+        g.camera.move(gl::Camera::Up, 0.01 * dy);
+    }
+    g.trackball.lastMouseX = xpos;
+    g.trackball.lastMouseY = ypos;
+}
+
+void debug_message_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
+                            const GLchar *message, const void *userParam)
+{
+    LOG(ERROR) << message;
 }

@@ -9,7 +9,7 @@ public:
     Texture() = default;
     Texture(const Texture &) = delete;
     ~Texture();
-    bool load(const std::wstring &imageFile);
+    bool load(const std::wstring &imageFile, bool flip_vertically = false);
     void use(unsigned idx) const;
 
 private:
