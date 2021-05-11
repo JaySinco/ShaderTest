@@ -76,16 +76,16 @@ int main(int argc, char **argv)
     if (!model.load(root_DIR L"/models/backpack/backpack.obj")) {
         return -1;
     }
-    auto diffuse = std::make_shared<gl::Texture>();
-    if (!diffuse->load(root_DIR L"/models/backpack/diffuse.jpg", false)) {
+    gl::Texture diffuse;
+    if (!diffuse.load(root_DIR L"/models/backpack/diffuse.jpg", false)) {
         return -1;
     }
     gl::Material material(0.5, 32);
-    material.attach(diffuse);
 
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         material.use(basic);
+        diffuse.use(basic, 0);
         model.draw(basic, g.camera);
         glfwSwapBuffers(window);
         glfwPollEvents();
