@@ -1,4 +1,5 @@
 #version 430 core
+#define MAX_LIGHTS 8
 
 layout(location = 0) in vec3 vt_Pos;
 layout(location = 1) in vec3 vt_Normal;
@@ -13,6 +14,21 @@ uniform mat4 uf_ProjectionMatrix;
 uniform mat4 uf_ModelViewMatrix;
 uniform mat4 uf_ModelViewProjectionMatrix;
 uniform mat3 uf_NormalMatrix;
+
+uniform struct p3d_LightSourceParameters
+{
+    vec4 color;
+    vec4 position;  // View-space position
+    vec3 spotDirection;
+    float spotCutoff;
+    float spotExponent;
+} uf_LightSource[MAX_LIGHTS];
+
+uniform struct
+{
+    vec3 specular;
+    float shininess;
+} uf_Material;
 
 void main()
 {

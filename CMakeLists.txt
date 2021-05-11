@@ -37,6 +37,8 @@ add_executable(sample
     ${CMAKE_SOURCE_DIR}/src/mesh.cpp
     ${CMAKE_SOURCE_DIR}/src/model.cpp
     ${CMAKE_SOURCE_DIR}/src/texture.cpp
+    ${CMAKE_SOURCE_DIR}/src/light.cpp
+    ${CMAKE_SOURCE_DIR}/src/material.cpp
     ${CMAKE_SOURCE_DIR}/src/camera.cpp
     ${CMAKE_SOURCE_DIR}/src/sample.cpp
 )
