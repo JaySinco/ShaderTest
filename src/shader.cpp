@@ -86,6 +86,13 @@ int Shader::get_loc(const std::string &name) const
 
 void Shader::set(const std::string &name, int v) const { glUniform1i(this->get_loc(name), v); }
 
+void Shader::set(const std::string &name, float v) const { glUniform1f(this->get_loc(name), v); }
+
+void Shader::set(const std::string &name, const glm::vec2 &v) const
+{
+    glUniform2fv(this->get_loc(name), 1, glm::value_ptr(v));
+}
+
 void Shader::set(const std::string &name, const glm::vec3 &v) const
 {
     glUniform3fv(this->get_loc(name), 1, glm::value_ptr(v));
@@ -94,6 +101,11 @@ void Shader::set(const std::string &name, const glm::vec3 &v) const
 void Shader::set(const std::string &name, const glm::vec4 &v) const
 {
     glUniform4fv(this->get_loc(name), 1, glm::value_ptr(v));
+}
+
+void Shader::set(const std::string &name, const glm::mat3 &v) const
+{
+    glUniformMatrix3fv(this->get_loc(name), 1, GL_FALSE, glm::value_ptr(v));
 }
 
 void Shader::set(const std::string &name, const glm::mat4 &v) const

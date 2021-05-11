@@ -1,5 +1,6 @@
 #include "model.h"
 #include "utils.h"
+#include <glm/gtc/matrix_inverse.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -9,9 +10,20 @@ namespace gl
 {
 Model::Model() { this->reset(); }
 
-void Model::draw(Shader &shader) const
+void Model::draw(Shader &shader, Camera &camera) const
 {
-    shader.set("uf_ModelMatrix", this->getModelMatrix());
+    glm::mat4 modelMatrix = this->getModelMatrix();
+    glm::mat4 viewMatrix = camera.getViewMatrix();
+    glm::mat4 projectionMatrix = camera.getProjectionMatrix();
+    glm::mat4 modelViewMatrix = viewMatrix * modelMatrix;
+
+    shader.set("uf_ModelMatrix", modelMatrix);
+    shader.set("uf_ViewMatrix", viewMatrix);
+    shader.set("uf_ProjectionMatrix", projectionMatrix);
+    shader.set("uf_ModelViewMatrix", modelViewMatrix);
+    shader.set("uf_ModelViewProjectionMatrix", projectionMatrix * modelViewMatrix);
+    shader.set("uf_NormalMatrix", glm::inverseTranspose(glm::mat3(modelViewMatrix)));
+
     for (const auto &mesh: this->meshes) {
         mesh->draw();
     }

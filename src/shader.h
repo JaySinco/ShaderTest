@@ -15,8 +15,11 @@ public:
     bool load(const std::wstring &vertFile, const std::wstring &fragFile);
     void use() const;
     void set(const std::string &name, int v) const;
+    void set(const std::string &name, float v) const;
+    void set(const std::string &name, const glm::vec2 &v) const;
     void set(const std::string &name, const glm::vec3 &v) const;
     void set(const std::string &name, const glm::vec4 &v) const;
+    void set(const std::string &name, const glm::mat3 &v) const;
     void set(const std::string &name, const glm::mat4 &v) const;
 
 private:

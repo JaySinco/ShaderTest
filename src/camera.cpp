@@ -77,12 +77,6 @@ Camera::Axis Camera::getAxis() const
     return axis;
 }
 
-void Camera::use(Shader &shader) const
-{
-    shader.set("uf_ViewMatrix", this->getViewMatrix());
-    shader.set("uf_ProjectionMatrix", this->getProjectionMatrix());
-}
-
 glm::mat4 Camera::getViewMatrix() const
 {
     Axis axis = this->getAxis();

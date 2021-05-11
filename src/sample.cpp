@@ -82,9 +82,8 @@ int main(int argc, char **argv)
 
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        g.camera.use(basic);
         diffuse.use(basic, 0);
-        model.draw(basic);
+        model.draw(basic, g.camera);
         glfwSwapBuffers(window);
         glfwPollEvents();
     }

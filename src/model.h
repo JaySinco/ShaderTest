@@ -1,6 +1,7 @@
 #pragma once
 #include "mesh.h"
 #include "shader.h"
+#include "camera.h"
 #include <vector>
 #include <string>
 #include <memory>
@@ -20,7 +21,7 @@ public:
     void spinTo(float degree, float axis_x, float axis_y, float axis_z);
     void zoom(float dx, float dy, float dz);
     void zoomTo(float x, float y, float z);
-    void draw(Shader &shader) const;
+    void draw(Shader &shader, Camera &camera) const;
     glm::mat4 getModelMatrix() const;
 
 private:

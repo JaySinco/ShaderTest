@@ -1,6 +1,7 @@
 #version 430 core
 
 in vec2 io_TexCoord;
+in vec3 io_Normal;
 
 out vec4 frag_Color;
 
