@@ -3,6 +3,7 @@
 #include "model.h"
 #include "texture.h"
 #include "camera.h"
+#include "light.h"
 #include "material.h"
 #include <glm/gtx/string_cast.hpp>
 #include <glad/glad.h>
@@ -72,20 +73,35 @@ int main(int argc, char **argv)
                     root_DIR L"/shaders/fragment/basic.frag")) {
         return -1;
     }
+
     gl::Model model;
-    if (!model.load(root_DIR L"/models/backpack/backpack.obj")) {
+    if (!model.load(root_DIR L"/models/planet/planet.obj")) {
         return -1;
     }
+    model.zoom(0.3, 0.3, 0.3);
+
     gl::Texture diffuse;
-    if (!diffuse.load(root_DIR L"/models/backpack/diffuse.jpg", false)) {
+    if (!diffuse.load(root_DIR L"/models/planet/mars.png", false)) {
         return -1;
     }
+
     gl::Material material(0.5, 32);
+
+    gl::Light light0;
+    light0.type = gl::Light::Ambient;
+    light0.color = glm::vec3(0.2);
+
+    gl::Light light1;
+    light1.type = gl::Light::Point;
+    light1.color = glm::vec3(0.8);
+    light1.position = glm::vec3(5, 5, 5);
 
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         material.use(basic);
         diffuse.use(basic, 0);
+        light0.use(basic, g.camera, 0);
+        light1.use(basic, g.camera, 1);
         model.draw(basic, g.camera);
         glfwSwapBuffers(window);
         glfwPollEvents();
