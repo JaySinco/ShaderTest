@@ -78,7 +78,7 @@ int main(int argc, char **argv)
     if (!model.load(root_DIR L"/models/planet/planet.obj")) {
         return -1;
     }
-    model.zoom(0.3, 0.3, 0.3);
+    model.zoom(0.2, 0.2, 0.2);
 
     gl::Texture diffuse;
     if (!diffuse.load(root_DIR L"/models/planet/mars.png", false)) {
@@ -89,7 +89,7 @@ int main(int argc, char **argv)
 
     gl::Light light0;
     light0.type = gl::Light::Ambient;
-    light0.color = glm::vec3(0.2);
+    light0.color = glm::vec3(0.0);
 
     gl::Light light1;
     light1.type = gl::Light::Point;

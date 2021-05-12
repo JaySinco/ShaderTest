@@ -25,11 +25,11 @@ uniform struct Material
     float shininess;
 } uf_Material;
 
-vec3 blendAmbient(Light light) { return light.color; }
+vec3 shineAmbient(Light light) { return light.color; }
 
-vec3 blendDirect(Light light) { return vec4(0); }
+vec3 shineDirect(Light light) { return vec4(0); }
 
-vec3 blendPoint(Light light)
+vec3 shinePoint(Light light)
 {
     vec3 normal = normalize(io_Normal);
     vec3 lightDir = normalize(light.position - io_Pos);
@@ -42,30 +42,30 @@ vec3 blendPoint(Light light)
     return light.color * (diffuse + spec * uf_Material.specular);
 }
 
-vec3 blendSpot(Light light) { return vec4(0); }
+vec3 shineSpot(Light light) { return vec4(0); }
 
 void main()
 {
-    vec3 mixedLight = vec3(0);
+    vec3 blendLight = vec3(0);
     for (int i = 0; i < MAX_LIGHTS; ++i) {
         switch (uf_Lights[i].type) {
             case 0:
                 break;
             case 1:
-                mixedLight += blendAmbient(uf_Lights[i]);
+                blendLight += shineAmbient(uf_Lights[i]);
                 break;
             case 2:
-                mixedLight += blendDirect(uf_Lights[i]);
+                blendLight += shineDirect(uf_Lights[i]);
                 break;
             case 3:
-                mixedLight += blendPoint(uf_Lights[i]);
+                blendLight += shinePoint(uf_Lights[i]);
                 break;
             case 4:
-                mixedLight += blendSpot(uf_Lights[i]);
+                blendLight += shineSpot(uf_Lights[i]);
                 break;
         }
     }
     vec4 skyBlue = vec4(vec3(135, 206, 235) / 255, 1);
     vec4 texColor = texture(uf_Texture0, io_TexCoord);
-    frag_Color = vec4(mixedLight, 1.0) * skyBlue;
+    frag_Color = vec4(blendLight, 1.0) * skyBlue;
 }
