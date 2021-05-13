@@ -7,50 +7,77 @@ in vec2 io_TexCoord;
 
 out vec4 frag_Color;
 
+struct AttenateSettings
+{
+    float constant;
+    float linear;
+    float quadratic;
+};
+
+struct SpotSettings
+{
+    float cutoff;
+    float exponent;
+};
+
 uniform struct Light
 {
     int type;
-    vec3 color;
+    vec4 color;
     vec3 position;
     vec3 direction;
-    float spotCutoff;
-    float spotExponent;
+    AttenateSettings attenuation;
+    SpotSettings spot;
 } uf_Lights[MAX_LIGHTS];
 
 uniform struct Material
 {
+    vec4 color;
     sampler2D diffuse;
     sampler2D specular;
     float shininess;
 } uf_Material;
 
-vec3 castAmbient(Light light)
+vec4 calcDiffuse(vec3 lightDir)
 {
-    return light.color * texture(uf_Material.diffuse, io_TexCoord).rgb;
+    float diff = max(dot(normalize(io_Normal), lightDir), 0.0);
+    return diff * (uf_Material.color == vec4(0)
+                       ? vec4(texture(uf_Material.diffuse, io_TexCoord).rgb, 1.0)
+                       : uf_Material.color);
 }
 
-vec3 castDirect(Light light) { return vec4(0); }
-
-vec3 castPoint(Light light)
+vec4 calcSpecular(vec3 lightDir)
 {
-    vec3 normal = normalize(io_Normal);
-    vec3 lightDir = normalize(light.position - io_Pos);
-    float diff = max(dot(normal, lightDir), 0.0);
-    vec3 diffuse = diff * texture(uf_Material.diffuse, io_TexCoord).rgb;
-
     vec3 viewDir = normalize(vec3(0) - io_Pos);
-    vec3 reflectDir = reflect(-lightDir, normal);
+    vec3 reflectDir = reflect(-lightDir, normalize(io_Normal));
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), uf_Material.shininess);
-    vec3 specular = spec * texture(uf_Material.specular, io_TexCoord).rgb;
-
-    return light.color * (diffuse + specular);
+    return spec * (uf_Material.color == vec4(0)
+                       ? vec4(texture(uf_Material.specular, io_TexCoord).rgb, 1.0)
+                       : vec4(0.5));
 }
 
-vec3 castSpot(Light light) { return vec3(0); }
+vec4 castAmbient(Light light)
+{
+    return light.color * vec4(texture(uf_Material.diffuse, io_TexCoord).rgb, 1.0);
+}
+
+vec4 castDirect(Light light)
+{
+    vec3 lightDir = -normalize(light.direction);
+    return light.color * (calcDiffuse(lightDir) + calcSpecular(lightDir));
+}
+
+vec4 castPoint(Light light)
+{
+    vec3 lightDir = normalize(light.position - io_Pos);
+    return light.color * (calcDiffuse(lightDir) + calcSpecular(lightDir));
+}
+
+vec4 castSpot(Light light) { return vec4(0); }
 
 void main()
 {
-    vec3 blendLight = vec3(0);
+    vec4 blendLight = vec4(0);
     for (int i = 0; i < MAX_LIGHTS; ++i) {
         switch (uf_Lights[i].type) {
             case 0:
@@ -69,5 +96,5 @@ void main()
                 break;
         }
     }
-    frag_Color = vec4(blendLight, 1.0);
+    frag_Color = blendLight;
 }

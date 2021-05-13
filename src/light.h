@@ -20,7 +20,7 @@ public:
         Spot = 4,
     };
     Type type;
-    glm::vec3 color;
+    glm::vec4 color;
     glm::vec3 position;
     glm::vec3 direction;
     float spotCutoff;

@@ -64,7 +64,6 @@ int main(int argc, char **argv)
     }
 
     glEnable(GL_DEPTH_TEST);
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
     glDebugMessageCallback(debug_message_callback, nullptr);
 
@@ -75,31 +74,41 @@ int main(int argc, char **argv)
     }
 
     gl::Model model;
-    if (!model.load(root_DIR L"/models/cyborg/cyborg.obj")) {
+    // if (!model.load(root_DIR L"/models/cyborg/cyborg.obj")) {
+    //     return -1;
+    // }
+    // model.zoom(0.55, 0.55, 0.55);
+    // model.move(0.0, -1.0, 0.0);
+    if (!model.load(root_DIR L"/models/planet/planet.obj")) {
         return -1;
     }
-    model.zoom(0.55, 0.55, 0.55);
-    model.move(0.0, -1.0, 0.0);
+    model.zoom(0.25, 0.25, 0.25);
 
     gl::Material material;
-    material.diffuse = std::make_shared<gl::Texture>();
-    if (!material.diffuse->load(root_DIR L"/models/cyborg/cyborg_diffuse.png", true)) {
-        return -1;
-    }
-    material.specular = std::make_shared<gl::Texture>();
-    if (!material.specular->load(root_DIR L"/models/cyborg/cyborg_specular.png", true)) {
-        return -1;
-    }
+    material.color = glm::vec4(0.53, 0.8, 0.92, 1.0);
+    // material.diffuse = std::make_shared<gl::Texture>();
+    // if (!material.diffuse->load(root_DIR L"/models/cyborg/cyborg_diffuse.png", true)) {
+    //     return -1;
+    // }
+    // material.specular = std::make_shared<gl::Texture>();
+    // if (!material.specular->load(root_DIR L"/models/cyborg/cyborg_specular.png", true)) {
+    //     return -1;
+    // }
     material.shininess = 0.25 * 128;
 
     gl::Light light0;
     light0.type = gl::Light::Ambient;
-    light0.color = glm::vec3(0.0);
+    light0.color = glm::vec4(0);
 
     gl::Light light1;
-    light1.type = gl::Light::Point;
-    light1.color = glm::vec3(0.8);
-    light1.position = glm::vec3(0, 5, 3);
+    light1.type = gl::Light::Direct;
+    light1.color = glm::vec4(glm::vec3(0.8), 1.0);
+    light1.direction = glm::vec3(-1, -1, 0);
+
+    gl::Light light2;
+    light2.type = gl::Light::Point;
+    light2.color = glm::vec4(glm::vec3(0.8), 1.0);
+    light2.position = glm::vec3(0, 5, 3);
 
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
