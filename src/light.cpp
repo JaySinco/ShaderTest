@@ -14,8 +14,12 @@ void Light::use(Shader &shader, Camera &camera, unsigned idx) const
     shader.set(fmt::format("uf_Lights[{}].color", idx), this->color);
     shader.set(fmt::format("uf_Lights[{}].position", idx), viewPos);
     shader.set(fmt::format("uf_Lights[{}].direction", idx), viewDirection);
-    shader.set(fmt::format("uf_Lights[{}].spotCutoff", idx), this->spotCutoff);
-    shader.set(fmt::format("uf_Lights[{}].spotExponent", idx), this->spotExponent);
+    shader.set(fmt::format("uf_Lights[{}].attenuation.constant", idx), this->attenuation.constant);
+    shader.set(fmt::format("uf_Lights[{}].attenuation.linear", idx), this->attenuation.linear);
+    shader.set(fmt::format("uf_Lights[{}].attenuation.quadratic", idx),
+               this->attenuation.quadratic);
+    shader.set(fmt::format("uf_Lights[{}].spot.cutoff", idx), this->spot.cutoff);
+    shader.set(fmt::format("uf_Lights[{}].spot.exponent", idx), this->spot.exponent);
 }
 
 }  // namespace gl

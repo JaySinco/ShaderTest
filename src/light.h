@@ -23,8 +23,17 @@ public:
     glm::vec4 color;
     glm::vec3 position;
     glm::vec3 direction;
-    float spotCutoff;
-    float spotExponent;
+    struct
+    {
+        float constant;
+        float linear;
+        float quadratic;
+    } attenuation;
+    struct
+    {
+        float cutoff;
+        float exponent;
+    } spot;
 };
 
 }  // namespace gl
