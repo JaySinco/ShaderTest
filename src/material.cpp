@@ -2,11 +2,10 @@
 
 namespace gl
 {
-Material::Material(float specular, float shineness): specular(specular), shininess(shineness) {}
-
 void Material::use(Shader &shader) const
 {
-    shader.set("uf_Material.specular", this->specular);
+    if (this->diffuse) this->diffuse->use(shader, "uf_Material.diffuse", 0);
+    if (this->specular) this->specular->use(shader, "uf_Material.specular", 1);
     shader.set("uf_Material.shininess", this->shininess);
 }
 

@@ -1,5 +1,6 @@
 #include "model.h"
 #include "utils.h"
+#include <filesystem>
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <assimp/Importer.hpp>
@@ -92,6 +93,7 @@ static std::shared_ptr<Mesh> convert(aiMesh *mesh, const aiScene *scene)
     }
     auto pMesh = std::make_shared<Mesh>();
     pMesh->load(vertices, indices);
+    LOG(INFO) << "-- " << mesh->mName.C_Str() << ", faces=" << mesh->mNumFaces;
     return pMesh;
 }
 
@@ -116,6 +118,7 @@ bool Model::load(const std::wstring &modelFile)
         LOG(ERROR) << "failed to import model: " << importer.GetErrorString();
         return false;
     }
+    LOG(INFO) << "loading \"" << utils::ws2s(std::filesystem::path(modelFile).filename()) << "\"";
     iterNode(scene->mRootNode, scene, this->meshes);
     return true;
 }

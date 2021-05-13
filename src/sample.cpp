@@ -68,24 +68,29 @@ int main(int argc, char **argv)
     glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
     glDebugMessageCallback(debug_message_callback, nullptr);
 
-    gl::Shader basic;
-    if (!basic.load(root_DIR L"/shaders/vertex/basic.vert",
-                    root_DIR L"/shaders/fragment/basic.frag")) {
+    gl::Shader phong;
+    if (!phong.load(root_DIR L"/shaders/vertex/phong.vert",
+                    root_DIR L"/shaders/fragment/phong.frag")) {
         return -1;
     }
 
     gl::Model model;
-    if (!model.load(root_DIR L"/models/planet/planet.obj")) {
+    if (!model.load(root_DIR L"/models/cyborg/cyborg.obj")) {
         return -1;
     }
-    model.zoom(0.2, 0.2, 0.2);
+    model.zoom(0.55, 0.55, 0.55);
+    model.move(0.0, -1.0, 0.0);
 
-    gl::Texture diffuse;
-    if (!diffuse.load(root_DIR L"/models/planet/mars.png", false)) {
+    gl::Material material;
+    material.diffuse = std::make_shared<gl::Texture>();
+    if (!material.diffuse->load(root_DIR L"/models/cyborg/cyborg_diffuse.png", true)) {
         return -1;
     }
-
-    gl::Material material(0.5, 32);
+    material.specular = std::make_shared<gl::Texture>();
+    if (!material.specular->load(root_DIR L"/models/cyborg/cyborg_specular.png", true)) {
+        return -1;
+    }
+    material.shininess = 0.25 * 128;
 
     gl::Light light0;
     light0.type = gl::Light::Ambient;
@@ -94,15 +99,14 @@ int main(int argc, char **argv)
     gl::Light light1;
     light1.type = gl::Light::Point;
     light1.color = glm::vec3(0.8);
-    light1.position = glm::vec3(5, 5, 5);
+    light1.position = glm::vec3(0, 5, 3);
 
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        material.use(basic);
-        diffuse.use(basic, 0);
-        light0.use(basic, g.camera, 0);
-        light1.use(basic, g.camera, 1);
-        model.draw(basic, g.camera);
+        material.use(phong);
+        light0.use(phong, g.camera, 0);
+        light1.use(phong, g.camera, 1);
+        model.draw(phong, g.camera);
         glfwSwapBuffers(window);
         glfwPollEvents();
     }

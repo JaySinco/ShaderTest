@@ -70,9 +70,9 @@ std::pair<bool, unsigned> Shader::compile(const std::wstring &file)
     int succ = 0;
     glGetShaderiv(shader, GL_COMPILE_STATUS, &succ);
     if (!succ) {
-        char log[512]{0};
-        glGetShaderInfoLog(shader, 512, NULL, log);
-        LOG(ERROR) << "failed to compile shader: " << utils::ws2s(file) << "\n" << log;
+        // char log[512]{0};
+        // glGetShaderInfoLog(shader, 512, NULL, log);
+        // LOG(ERROR) << "failed to compile shader: " << utils::ws2s(file) << "\n" << log;
         return {false, 0};
     }
     return {true, shader};

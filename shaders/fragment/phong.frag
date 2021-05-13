@@ -7,8 +7,6 @@ in vec2 io_TexCoord;
 
 out vec4 frag_Color;
 
-uniform sampler2D uf_Texture0;
-
 uniform struct Light
 {
     int type;
@@ -21,28 +19,34 @@ uniform struct Light
 
 uniform struct Material
 {
-    vec3 specular;
+    sampler2D diffuse;
+    sampler2D specular;
     float shininess;
 } uf_Material;
 
-vec3 shineAmbient(Light light) { return light.color; }
+vec3 castAmbient(Light light)
+{
+    return light.color * texture(uf_Material.diffuse, io_TexCoord).rgb;
+}
 
-vec3 shineDirect(Light light) { return vec4(0); }
+vec3 castDirect(Light light) { return vec4(0); }
 
-vec3 shinePoint(Light light)
+vec3 castPoint(Light light)
 {
     vec3 normal = normalize(io_Normal);
     vec3 lightDir = normalize(light.position - io_Pos);
-    float diffuse = max(dot(normal, lightDir), 0.0);
+    float diff = max(dot(normal, lightDir), 0.0);
+    vec3 diffuse = diff * texture(uf_Material.diffuse, io_TexCoord).rgb;
 
     vec3 viewDir = normalize(vec3(0) - io_Pos);
     vec3 reflectDir = reflect(-lightDir, normal);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), uf_Material.shininess);
+    vec3 specular = spec * texture(uf_Material.specular, io_TexCoord).rgb;
 
-    return light.color * (diffuse + spec * uf_Material.specular);
+    return light.color * (diffuse + specular);
 }
 
-vec3 shineSpot(Light light) { return vec4(0); }
+vec3 castSpot(Light light) { return vec3(0); }
 
 void main()
 {
@@ -52,20 +56,18 @@ void main()
             case 0:
                 break;
             case 1:
-                blendLight += shineAmbient(uf_Lights[i]);
+                blendLight += castAmbient(uf_Lights[i]);
                 break;
             case 2:
-                blendLight += shineDirect(uf_Lights[i]);
+                blendLight += castDirect(uf_Lights[i]);
                 break;
             case 3:
-                blendLight += shinePoint(uf_Lights[i]);
+                blendLight += castPoint(uf_Lights[i]);
                 break;
             case 4:
-                blendLight += shineSpot(uf_Lights[i]);
+                blendLight += castSpot(uf_Lights[i]);
                 break;
         }
     }
-    vec4 skyBlue = vec4(vec3(135, 206, 235) / 255, 1);
-    vec4 texColor = texture(uf_Texture0, io_TexCoord);
-    frag_Color = vec4(blendLight, 1.0) * skyBlue;
+    frag_Color = vec4(blendLight, 1.0);
 }

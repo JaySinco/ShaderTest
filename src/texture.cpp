@@ -1,7 +1,8 @@
 #include "texture.h"
 #include "utils.h"
+#include <filesystem>
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+#include <stb_image.h>
 #include <glad/glad.h>
 
 namespace gl
@@ -29,6 +30,8 @@ bool Texture::load(const std::wstring &imageFile, bool flip_vertically)
         LOG(ERROR) << "failed to load image: " << path;
         return false;
     }
+    LOG(INFO) << "loading \"" << utils::ws2s(std::filesystem::path(imageFile).filename())
+              << "\", size=" << width << "x" << height << ", channel=" << channel;
     std::shared_ptr<void> data_guard(nullptr, [=](void *) { stbi_image_free(data); });
     if (channel != 1 && channel != 3 && channel != 4) {
         LOG(ERROR) << "invalid image channel: " << channel;
@@ -41,10 +44,10 @@ bool Texture::load(const std::wstring &imageFile, bool flip_vertically)
     return true;
 }
 
-void Texture::use(Shader &shader, unsigned idx) const
+void Texture::use(Shader &shader, const std::string &name, unsigned idx) const
 {
     glActiveTexture(GL_TEXTURE0 + idx);
-    shader.set(fmt::format("uf_Texture{}", idx), static_cast<int>(idx));
+    shader.set(name, static_cast<int>(idx));
     glBindTexture(GL_TEXTURE_2D, this->texture);
 }
 
