@@ -5,7 +5,6 @@
 #include "camera.h"
 #include "light.h"
 #include "material.h"
-#include <glm/gtx/string_cast.hpp>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -77,12 +76,9 @@ int main(int argc, char **argv)
     // if (!model.load(root_DIR L"/models/cyborg/cyborg.obj")) {
     //     return -1;
     // }
-    // model.zoom(0.55, 0.55, 0.55);
-    // model.move(0.0, -1.0, 0.0);
     if (!model.load(root_DIR L"/models/planet/planet.obj")) {
         return -1;
     }
-    model.zoom(0.25, 0.25, 0.25);
 
     gl::Material material;
     material.color = glm::vec4(0.53, 0.8, 0.92, 1.0);
@@ -108,13 +104,16 @@ int main(int argc, char **argv)
     gl::Light light2;
     light2.type = gl::Light::Point;
     light2.color = glm::vec4(glm::vec3(0.8), 1.0);
-    light2.position = glm::vec3(0, 5, 3);
+    light2.position = glm::vec3(0, 2, 2);
+    light2.attenuation.constant = 1.0;
+    light2.attenuation.linear = 0.07;
+    light2.attenuation.quadratic = 0.017;
 
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         material.use(phong);
         light0.use(phong, g.camera, 0);
-        light1.use(phong, g.camera, 1);
+        light2.use(phong, g.camera, 1);
         model.draw(phong, g.camera);
         glfwSwapBuffers(window);
         glfwPollEvents();

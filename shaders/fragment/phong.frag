@@ -7,7 +7,7 @@ in vec2 io_TexCoord;
 
 out vec4 frag_Color;
 
-struct AttenateSettings
+struct AttenuateSettings
 {
     float constant;
     float linear;
@@ -26,7 +26,7 @@ uniform struct Light
     vec4 color;
     vec3 position;
     vec3 direction;
-    AttenateSettings attenuation;
+    AttenuateSettings attenuation;
     SpotSettings spot;
 } uf_Lights[MAX_LIGHTS];
 
@@ -70,7 +70,10 @@ vec4 castDirect(Light light)
 vec4 castPoint(Light light)
 {
     vec3 lightDir = normalize(light.position - io_Pos);
-    return light.color * (calcDiffuse(lightDir) + calcSpecular(lightDir));
+    float distance = length(light.position - io_Pos);
+    float attenuation = 1.0 / (light.attenuation.constant + light.attenuation.linear * distance +
+                               light.attenuation.quadratic * (distance * distance));
+    return light.color * attenuation * (calcDiffuse(lightDir) + calcSpecular(lightDir));
 }
 
 vec4 castSpot(Light light) { return vec4(0); }

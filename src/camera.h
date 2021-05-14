@@ -23,11 +23,8 @@ public:
     void adaptToScreen(int width, int height);
     void move(Face face, float distance);
     void move(float dx, float dy, float dz);
-    void moveTo(float x, float y, float z);
     void shake(float ddegree);
-    void shakeTo(float degree);
     void nod(float ddegree);
-    void nodTo(float degree);
     glm::mat4 getViewMatrix() const;
     glm::mat4 getProjectionMatrix() const;
     glm::mat4 getViewProjectionMatrix() const;

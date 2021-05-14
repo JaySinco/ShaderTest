@@ -52,18 +52,12 @@ void Camera::move(Face face, float distance)
 
 void Camera::move(float dx, float dy, float dz) { this->pos += glm::vec3(dx, dy, dz); }
 
-void Camera::moveTo(float x, float y, float z) { this->pos = glm::vec3(x, y, z); }
-
 void Camera::shake(float ddegree) { this->yaw += ddegree; }
-
-void Camera::shakeTo(float degree) { this->shake(degree - this->yaw); }
 
 void Camera::nod(float ddegree)
 {
     this->pitch = std::max(std::min(this->pitch + ddegree, 89.0f), -89.0f);
 }
-
-void Camera::nodTo(float degree) { this->nod(degree - pitch); }
 
 Camera::Axis Camera::getAxis() const
 {
