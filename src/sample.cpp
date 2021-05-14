@@ -63,6 +63,8 @@ int main(int argc, char **argv)
     }
 
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_STENCIL_TEST);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
     glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
     glDebugMessageCallback(debug_message_callback, nullptr);
 
@@ -73,28 +75,28 @@ int main(int argc, char **argv)
     }
 
     gl::Model model;
-    // if (!model.load(root_DIR L"/models/cyborg/cyborg.obj")) {
-    //     return -1;
-    // }
-    if (!model.load(root_DIR L"/models/planet/planet.obj")) {
+    if (!model.load(root_DIR L"/models/cyborg/cyborg.obj")) {
         return -1;
     }
+    // if (!model.load(root_DIR L"/models/planet/planet.obj")) {
+    //     return -1;
+    // }
 
     gl::Material material;
-    material.color = glm::vec4(0.53, 0.8, 0.92, 1.0);
-    // material.diffuse = std::make_shared<gl::Texture>();
-    // if (!material.diffuse->load(root_DIR L"/models/cyborg/cyborg_diffuse.png", true)) {
-    //     return -1;
-    // }
-    // material.specular = std::make_shared<gl::Texture>();
-    // if (!material.specular->load(root_DIR L"/models/cyborg/cyborg_specular.png", true)) {
-    //     return -1;
-    // }
+    // material.color = glm::vec4(0.53, 0.8, 0.92, 1.0);
+    material.diffuse = std::make_shared<gl::Texture>();
+    if (!material.diffuse->load(root_DIR L"/models/cyborg/cyborg_diffuse.png", true)) {
+        return -1;
+    }
+    material.specular = std::make_shared<gl::Texture>();
+    if (!material.specular->load(root_DIR L"/models/cyborg/cyborg_specular.png", true)) {
+        return -1;
+    }
     material.shininess = 0.25 * 128;
 
     gl::Light light0;
     light0.type = gl::Light::Ambient;
-    light0.color = glm::vec4(0);
+    light0.color = glm::vec4(glm::vec3(0.2), 1.0);
 
     gl::Light light1;
     light1.type = gl::Light::Direct;
@@ -109,12 +111,24 @@ int main(int argc, char **argv)
     light2.attenuation.linear = 0.07;
     light2.attenuation.quadratic = 0.017;
 
+    gl::Light light3;
+    light3.type = gl::Light::Spot;
+    light3.color = glm::vec4(glm::vec3(0.8), 1.0);
+    light3.position = glm::vec3(0, 0, 3);
+    light3.direction = glm::vec3(0, 0.2, -1);
+    light3.attenuation.constant = 1.0;
+    light3.attenuation.linear = 0.07;
+    light3.attenuation.quadratic = 0.017;
+    light3.spot.cutoff = 5;
+    light3.spot.outerCutoff = 8;
+
     while (!glfwWindowShouldClose(window)) {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        glStencilMask(0x00);
         material.use(phong);
         light0.use(phong, g.camera, 0);
-        light2.use(phong, g.camera, 1);
-        model.draw(phong, g.camera);
+        light3.use(phong, g.camera, 1);
+        model.draw(phong, g.camera, true);
         glfwSwapBuffers(window);
         glfwPollEvents();
     }

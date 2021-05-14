@@ -4,13 +4,16 @@
 #include <filesystem>
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/ext/matrix_transform.hpp>
+#include <glad/glad.h>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
 namespace gl
 {
-void Model::draw(Shader &shader, Camera &camera) const
+std::shared_ptr<Shader> Model::outlineShader;
+
+void Model::draw(Shader &shader, Camera &camera, bool outline) const
 {
     glm::mat4 modelMatrix = this->getModelMatrix();
     glm::mat4 viewMatrix = camera.getViewMatrix();
@@ -24,8 +27,33 @@ void Model::draw(Shader &shader, Camera &camera) const
     shader.set("uf_ModelViewProjectionMatrix", projectionMatrix * modelViewMatrix);
     shader.set("uf_NormalMatrix", glm::inverseTranspose(glm::mat3(modelViewMatrix)));
 
+    if (outline) {
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);
+        glStencilMask(0xFF);
+    }
     for (const auto &mesh: this->meshes) {
         mesh->draw();
+    }
+    if (outline) {
+        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+        glStencilMask(0x00);
+        glDisable(GL_DEPTH_TEST);
+        std::shared_ptr<void> paramGuard(nullptr, [](void *) {
+            glStencilFunc(GL_ALWAYS, 0, 0xFF);
+            glStencilMask(0xFF);
+            glEnable(GL_DEPTH_TEST);
+        });
+        if (!outlineShader) {
+            outlineShader = std::make_shared<Shader>();
+            if (!outlineShader->load(root_DIR L"/shaders/vertex/solid-color.vert",
+                                     root_DIR L"/shaders/fragment/solid-color.frag")) {
+                return;
+            }
+        }
+        outlineShader->set("uf_Material.color", glm::vec4(1, 0.843, 0, 1));
+        Model copyed = *this;
+        copyed.zoom(1.05, 1.05, 1.05);
+        copyed.draw(*outlineShader, camera, false);
     }
 }
 

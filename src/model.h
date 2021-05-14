@@ -23,10 +23,11 @@ public:
     void move(float dx, float dy, float dz);
     void spin(float ddegree, float axis_x, float axis_y, float axis_z);
     void zoom(float dx, float dy, float dz);
-    void draw(Shader &shader, Camera &camera) const;
+    void draw(Shader &shader, Camera &camera, bool outline = false) const;
     glm::mat4 getModelMatrix() const;
 
 private:
+    static std::shared_ptr<Shader> outlineShader;
     BoundingRect rect;
     std::vector<std::shared_ptr<Mesh>> meshes;
     glm::mat4 translate, rotate, scale;

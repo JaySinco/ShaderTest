@@ -53,7 +53,9 @@ void Shader::use() const { glUseProgram(this->program); }
 std::pair<bool, unsigned> Shader::compile(const std::wstring &file)
 {
     unsigned type;
-    std::wstring suffix = std::filesystem::path(file).extension().generic_wstring();
+    auto filePath = std::filesystem::path(file);
+    LOG(INFO) << "compiling \"" << utils::ws2s(filePath.filename()) << "\"";
+    std::wstring suffix = filePath.extension().generic_wstring();
     if (suffix == L".vert") {
         type = GL_VERTEX_SHADER;
     } else if (suffix == L".frag") {

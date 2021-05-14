@@ -32,7 +32,7 @@ public:
     struct
     {
         float cutoff;
-        float exponent;
+        float outerCutoff;
     } spot;
 };
 

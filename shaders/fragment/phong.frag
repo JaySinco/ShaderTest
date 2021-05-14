@@ -17,7 +17,7 @@ struct AttenuateSettings
 struct SpotSettings
 {
     float cutoff;
-    float exponent;
+    float outerCutoff;
 };
 
 uniform struct Light
@@ -41,9 +41,8 @@ uniform struct Material
 vec4 calcDiffuse(vec3 lightDir)
 {
     float diff = max(dot(normalize(io_Normal), lightDir), 0.0);
-    return diff * (uf_Material.color == vec4(0)
-                       ? vec4(texture(uf_Material.diffuse, io_TexCoord).rgb, 1.0)
-                       : uf_Material.color);
+    return diff * (uf_Material.color == vec4(0) ? texture(uf_Material.diffuse, io_TexCoord)
+                                                : uf_Material.color);
 }
 
 vec4 calcSpecular(vec3 lightDir)
@@ -51,15 +50,21 @@ vec4 calcSpecular(vec3 lightDir)
     vec3 viewDir = normalize(vec3(0) - io_Pos);
     vec3 reflectDir = reflect(-lightDir, normalize(io_Normal));
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), uf_Material.shininess);
-    return spec * (uf_Material.color == vec4(0)
-                       ? vec4(texture(uf_Material.specular, io_TexCoord).rgb, 1.0)
-                       : vec4(0.5));
+    vec4 texColor = texture(uf_Material.specular, io_TexCoord);
+    if (texColor.r != 0 && texColor.g == 0 && texColor.b == 0) {
+        texColor.g = texColor.b = texColor.r;
+    }
+    return spec * (uf_Material.color == vec4(0) ? texColor : vec4(0.5));
 }
 
-vec4 castAmbient(Light light)
+float calcAttenuation(vec3 lightPos, AttenuateSettings settings)
 {
-    return light.color * vec4(texture(uf_Material.diffuse, io_TexCoord).rgb, 1.0);
+    float distance = length(lightPos - io_Pos);
+    return 1.0 / (settings.constant + settings.linear * distance +
+                  settings.quadratic * (distance * distance));
 }
+
+vec4 castAmbient(Light light) { return light.color * texture(uf_Material.diffuse, io_TexCoord); }
 
 vec4 castDirect(Light light)
 {
@@ -70,13 +75,19 @@ vec4 castDirect(Light light)
 vec4 castPoint(Light light)
 {
     vec3 lightDir = normalize(light.position - io_Pos);
-    float distance = length(light.position - io_Pos);
-    float attenuation = 1.0 / (light.attenuation.constant + light.attenuation.linear * distance +
-                               light.attenuation.quadratic * (distance * distance));
+    float attenuation = calcAttenuation(light.position, light.attenuation);
     return light.color * attenuation * (calcDiffuse(lightDir) + calcSpecular(lightDir));
 }
 
-vec4 castSpot(Light light) { return vec4(0); }
+vec4 castSpot(Light light)
+{
+    vec3 lightDir = normalize(light.position - io_Pos);
+    float attenuation = calcAttenuation(light.position, light.attenuation);
+    float theta = dot(lightDir, normalize(-light.direction));
+    float epsilon = light.spot.cutoff - light.spot.outerCutoff;
+    float intensity = clamp((theta - light.spot.outerCutoff) / epsilon, 0.0, 1.0);
+    return light.color * attenuation * intensity * (calcDiffuse(lightDir) + calcSpecular(lightDir));
+}
 
 void main()
 {

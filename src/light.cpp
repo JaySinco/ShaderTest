@@ -1,5 +1,6 @@
 #include "light.h"
 #include "utils.h"
+#include <glm/trigonometric.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
 
 namespace gl
@@ -18,8 +19,10 @@ void Light::use(Shader &shader, Camera &camera, unsigned idx) const
     shader.set(fmt::format("uf_Lights[{}].attenuation.linear", idx), this->attenuation.linear);
     shader.set(fmt::format("uf_Lights[{}].attenuation.quadratic", idx),
                this->attenuation.quadratic);
-    shader.set(fmt::format("uf_Lights[{}].spot.cutoff", idx), this->spot.cutoff);
-    shader.set(fmt::format("uf_Lights[{}].spot.exponent", idx), this->spot.exponent);
+    shader.set(fmt::format("uf_Lights[{}].spot.cutoff", idx),
+               glm::cos(glm::radians(this->spot.cutoff)));
+    shader.set(fmt::format("uf_Lights[{}].spot.outerCutoff", idx),
+               glm::cos(glm::radians(this->spot.outerCutoff)));
 }
 
 }  // namespace gl
