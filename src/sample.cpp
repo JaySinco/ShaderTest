@@ -63,8 +63,6 @@ int main(int argc, char **argv)
     }
 
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_STENCIL_TEST);
-    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
     glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
     glDebugMessageCallback(debug_message_callback, nullptr);
 
@@ -123,12 +121,11 @@ int main(int argc, char **argv)
     light3.spot.outerCutoff = 8;
 
     while (!glfwWindowShouldClose(window)) {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        glStencilMask(0x00);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         material.use(phong);
         light0.use(phong, g.camera, 0);
         light3.use(phong, g.camera, 1);
-        model.draw(phong, g.camera, true);
+        model.draw(phong, g.camera);
         glfwSwapBuffers(window);
         glfwPollEvents();
     }

@@ -11,9 +11,7 @@
 
 namespace gl
 {
-std::shared_ptr<Shader> Model::outlineShader;
-
-void Model::draw(Shader &shader, Camera &camera, bool outline) const
+void Model::draw(Shader &shader, Camera &camera) const
 {
     glm::mat4 modelMatrix = this->getModelMatrix();
     glm::mat4 viewMatrix = camera.getViewMatrix();
@@ -27,45 +25,16 @@ void Model::draw(Shader &shader, Camera &camera, bool outline) const
     shader.set("uf_ModelViewProjectionMatrix", projectionMatrix * modelViewMatrix);
     shader.set("uf_NormalMatrix", glm::inverseTranspose(glm::mat3(modelViewMatrix)));
 
-    if (outline) {
-        glStencilFunc(GL_ALWAYS, 1, 0xFF);
-        glStencilMask(0xFF);
-    }
     for (const auto &mesh: this->meshes) {
         mesh->draw();
-    }
-    if (outline) {
-        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-        glStencilMask(0x00);
-        glDisable(GL_DEPTH_TEST);
-        std::shared_ptr<void> paramGuard(nullptr, [](void *) {
-            glStencilFunc(GL_ALWAYS, 0, 0xFF);
-            glStencilMask(0xFF);
-            glEnable(GL_DEPTH_TEST);
-        });
-        if (!outlineShader) {
-            outlineShader = std::make_shared<Shader>();
-            if (!outlineShader->load(root_DIR L"/shaders/vertex/solid-color.vert",
-                                     root_DIR L"/shaders/fragment/solid-color.frag")) {
-                return;
-            }
-        }
-        outlineShader->set("uf_Material.color", glm::vec4(1, 0.843, 0, 1));
-        Model copyed = *this;
-        copyed.zoom(1.05, 1.05, 1.05);
-        copyed.draw(*outlineShader, camera, false);
     }
 }
 
 void Model::reset()
 {
-    glm::vec3 size = this->rect.high - this->rect.lower;
-    float factor = 2.0f / std::max({size.x, size.y, size.z});
-    glm::vec3 center = (this->rect.high + this->rect.lower) / 2.0f * factor;
-
-    this->translate = glm::translate(glm::mat4(1.0f), -center);
+    this->translate = glm::mat4(1.0f);
     this->rotate = glm::mat4(1.0f);
-    this->scale = glm::scale(glm::mat4(1.0f), glm::vec3(factor));
+    this->scale = glm::mat4(1.0f);
 }
 
 void Model::move(float dx, float dy, float dz)
@@ -85,9 +54,18 @@ void Model::zoom(float dx, float dy, float dz)
     this->scale = glm::scale(glm::mat4(1.0f), glm::vec3(dx, dy, dz)) * this->scale;
 }
 
-glm::mat4 Model::getModelMatrix() const { return this->translate * this->rotate * this->scale; }
+glm::mat4 Model::getModelMatrix() const
+{
+    return this->translate * this->rotate * this->scale * this->init;
+}
 
-static std::shared_ptr<Mesh> convert(aiMesh *mesh, const aiScene *scene, Model::BoundingRect &rect)
+struct BoundingRect
+{
+    glm::vec3 lower;
+    glm::vec3 high;
+};
+
+static std::shared_ptr<Mesh> convert(aiMesh *mesh, const aiScene *scene, BoundingRect &rect)
 {
     std::vector<Vertex> vertices;
     std::vector<unsigned> indices;
@@ -121,7 +99,7 @@ static std::shared_ptr<Mesh> convert(aiMesh *mesh, const aiScene *scene, Model::
 }
 
 static void iterNode(aiNode *node, const aiScene *scene, std::vector<std::shared_ptr<Mesh>> &meshes,
-                     Model::BoundingRect &rect)
+                     BoundingRect &rect)
 {
     for (unsigned i = 0; i < node->mNumMeshes; i++) {
         aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
@@ -143,10 +121,16 @@ bool Model::load(const std::wstring &modelFile)
         return false;
     }
     LOG(INFO) << "loading \"" << utils::ws2s(std::filesystem::path(modelFile).filename()) << "\"";
-    this->rect.lower = glm::vec3(std::numeric_limits<float>::max());
-    this->rect.high = glm::vec3(std::numeric_limits<float>::min());
+    BoundingRect rect;
+    rect.lower = glm::vec3(std::numeric_limits<float>::max());
+    rect.high = glm::vec3(std::numeric_limits<float>::min());
     this->meshes.clear();
-    iterNode(scene->mRootNode, scene, this->meshes, this->rect);
+    iterNode(scene->mRootNode, scene, this->meshes, rect);
+    glm::vec3 center = (rect.high + rect.lower) / 2.0f;
+    glm::vec3 size = rect.high - rect.lower;
+    float factor = 2.0f / std::max({size.x, size.y, size.z});
+    this->init =
+        glm::scale(glm::mat4(1.0f), glm::vec3(factor)) * glm::translate(glm::mat4(1.0f), -center);
     this->reset();
     return true;
 }

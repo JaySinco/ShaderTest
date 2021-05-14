@@ -64,7 +64,11 @@ float calcAttenuation(vec3 lightPos, AttenuateSettings settings)
                   settings.quadratic * (distance * distance));
 }
 
-vec4 castAmbient(Light light) { return light.color * texture(uf_Material.diffuse, io_TexCoord); }
+vec4 castAmbient(Light light)
+{
+    return light.color * (uf_Material.color == vec4(0) ? texture(uf_Material.diffuse, io_TexCoord)
+                                                       : uf_Material.color);
+}
 
 vec4 castDirect(Light light)
 {
