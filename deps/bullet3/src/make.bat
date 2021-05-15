@@ -11,6 +11,7 @@ cmake -G Ninja ^
     -DCMAKE_INSTALL_PREFIX=%~dp0..\ ^
     -DCMAKE_BUILD_TYPE=Release ^
     -DBUILD_SHARED_LIBS=OFF ^
+    -DINSTALL_LIBS=ON ^
     ..\bullet3-3.17
 IF %ERRORLEVEL% == 0 (ninja && ninja install)
 POPD
